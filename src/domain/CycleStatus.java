@@ -4,6 +4,6 @@ public enum CycleStatus {
     UNINITIALIZED,
     ACTIVE,
     NEAR_LIMIT,
-    EXHAUSETED,
+    EXHAUSTED,
     ENDED
 }
