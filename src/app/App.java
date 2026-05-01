@@ -1,6 +1,7 @@
 package app;
 
 import com.formdev.flatlaf.FlatDarkLaf;
+import ui.DashboardScreen;
 import ui.SetupScreen;
 
 import javax.swing.*;
@@ -20,7 +21,7 @@ public class App {
         frame.setSize(800,600);
         frame.setResizable(false);
         frame.setVisible(true);
-        //showSetupScreen();
+        showSetupScreen();
     }
     public void showSetupScreen()
     {

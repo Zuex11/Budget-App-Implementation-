@@ -14,8 +14,6 @@ public class SetupScreen extends BaseScreen{
     private JButton startCycleButton;
     private JButton cancelButton;
     private JLabel errorLabel;
-    private JPanel panel;
-    private App app;
 
     public SetupScreen(App app) {
         super(app);
