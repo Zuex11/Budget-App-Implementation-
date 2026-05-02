@@ -5,17 +5,17 @@ import java.awt.event.ActionEvent;
 
 public class UIFactory {
 
-    public static JLabel createTitleLabel(String text) {
+    public static JLabel createTitleLabel(String text, int fontSize) {
 
         JLabel label = new JLabel(text);
-        label.setFont(new Font("SansSerif", Font.BOLD, 25));
+        label.setFont(new Font("SansSerif", Font.BOLD, fontSize));
         label.setForeground(AppColors.TEXT_PRIMARY);
         return label;
     }
 
-    public static JLabel createSubLabel(String text) {
+    public static JLabel createSubLabel(String text, int fontSize) {
         JLabel label = new JLabel(text);
-        label.setFont(new Font("SansSerif", Font.PLAIN, 18));
+        label.setFont(new Font("SansSerif", Font.PLAIN, fontSize));
         label.setForeground(AppColors.TEXT_SECONDARY);
         return label;
     }
