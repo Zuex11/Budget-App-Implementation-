@@ -1,19 +1,35 @@
 package util;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 
 public class UIFactory {
 
     public static JLabel createTitleLabel(String text) {
+
         JLabel label = new JLabel(text);
-        label.setFont(new Font("SansSerif", Font.BOLD, 20));
+        label.setFont(new Font("SansSerif", Font.BOLD, 25));
         label.setForeground(AppColors.TEXT_PRIMARY);
         return label;
     }
 
     public static JLabel createSubLabel(String text) {
         JLabel label = new JLabel(text);
-        label.setFont(new Font("SansSerif", Font.PLAIN, 12));
+        label.setFont(new Font("SansSerif", Font.PLAIN, 18));
+        label.setForeground(AppColors.TEXT_SECONDARY);
+        return label;
+    }
+    public static JLabel createNavTitleLabel(String text ) {
+
+        JLabel label = new JLabel(text);
+        label.setFont(new Font("SansSerif", Font.BOLD, 27));
+        label.setForeground(AppColors.TEXT_PRIMARY);
+        return label;
+    }
+
+    public static JLabel createNavSubLabel(String text, int fontSize) {
+        JLabel label = new JLabel(text);
+        label.setFont(new Font("SansSerif", Font.PLAIN, fontSize));
         label.setForeground(AppColors.TEXT_SECONDARY);
         return label;
     }
@@ -100,4 +116,5 @@ public class UIFactory {
         label.setVisible(false);
         return label;
     }
+
 }

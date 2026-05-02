@@ -2,10 +2,12 @@ package ui;
 
 import javax.swing.*;
 import app.App;
+import control.CycleManager;
 import util.AppColors;
 import util.UIFactory;
 
 import java.awt.*;
+import java.time.LocalDate;
 
 public class SetupScreen extends BaseScreen{
     private JTextField allowanceField;
@@ -34,8 +36,8 @@ public class SetupScreen extends BaseScreen{
         cancelButton     = UIFactory.createSecondaryButton("Cancel");
         errorLabel       = UIFactory.createErrorLabel();
 
-//        startCycleButton.addActionListener(e -> onStartCycleClicked());
-//        cancelButton.addActionListener(e -> System.exit(0));
+        startCycleButton.addActionListener(e -> onStartCycleClicked());
+        cancelButton.addActionListener(e -> System.exit(0));
     }
 
     @Override
@@ -139,18 +141,71 @@ public class SetupScreen extends BaseScreen{
     }
 
     public void onStartCycleClicked() {
-
+        if(validateInputs())
+        {
+            double allowance = Double.parseDouble(allowanceField.getText().replaceAll(",", ""));
+            LocalDate startDate = LocalDate.of(
+                    (int) startYear.getValue(),
+                    (int) startMonth.getValue(),
+                    (int) startDay.getValue()
+            );
+            LocalDate endDate = LocalDate.of(
+                    (int) endYear.getValue(),
+                    (int) endMonth.getValue(),
+                    (int) endDay.getValue()
+            );
+            app.getCycleManager().initializeCycle(allowance, startDate, endDate);
+        }
     }
 
     public boolean validateInputs() {
+        String allowance = allowanceField.getText().trim();
+        LocalDate todayDate = LocalDate.now();
+        LocalDate startDate = LocalDate.of(
+                (int) startYear.getValue(),
+                (int) startMonth.getValue(),
+                (int) startDay.getValue()
+        );
+        LocalDate endDate = LocalDate.of(
+                (int) endYear.getValue(),
+                (int) endMonth.getValue(),
+                (int) endDay.getValue()
+        );
+        if (allowance.isEmpty()) {
+            showError("Please fill all the fields!");
+            return false;
+        }
+        try {
+            double value = Double.parseDouble(allowance.replace(",", ""));
+            if (value <= 0) {
+                showError("Allowance must be greater than zero.");
+                return false;
+            }
+        } catch (NumberFormatException ex) {
+            showError("Allowance must be a valid number.");
+            return false;
+        }
+        if(startDate.isBefore(todayDate))
+        {
+            showError("Start date must be after today.");
+            return false;
+        }
+        if(endDate.isBefore(startDate))
+        {
+            showError("End date must be after start date.");
+            return false;
+        }
+
+        errorLabel.setVisible(false);
         return true;
     }
 
     public void showError(String message) {
-
+        errorLabel.setText(message);
+        errorLabel.setVisible(true);
     }
 
     public void navigateToDashboard() {
-
+        app.showDashboardScreen();
     }
 }

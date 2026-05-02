@@ -1,13 +1,15 @@
 package app;
 
 import com.formdev.flatlaf.FlatDarkLaf;
-import ui.DashboardScreen;
-import ui.SetupScreen;
+import control.CycleManager;
+import ui.*;
 
 import javax.swing.*;
+import java.util.concurrent.CyclicBarrier;
 
 public class App {
     private JFrame frame;
+    private CycleManager cycleManager;
 
     App()
     {
@@ -21,7 +23,8 @@ public class App {
         frame.setSize(800,600);
         frame.setResizable(false);
         frame.setVisible(true);
-        showSetupScreen();
+        //showSetupScreen();
+        showDashboardScreen();
     }
     public void showSetupScreen()
     {
@@ -31,5 +34,21 @@ public class App {
     public void showDashboardScreen()
     {
         frame.setContentPane(new DashboardScreen(this).getPanel());
+        frame.revalidate();
     }
+    public void showExpenseLoggingScreen()
+    {
+        frame.setContentPane(new ExpenseLoggingScreen(this).getPanel());
+        frame.revalidate();
+    }
+    public void showHistoryScreen()
+    {
+        frame.setContentPane(new HistoryScreen(this).getPanel());
+        frame.revalidate();
+    }
+    public void showSettingsScreen(){
+        frame.setContentPane(new SettingsScreen(this).getPanel());
+        frame.revalidate();
+    }
+    public CycleManager getCycleManager(){return cycleManager;}
 }
