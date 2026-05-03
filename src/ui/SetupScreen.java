@@ -53,6 +53,7 @@ public class SetupScreen extends BaseScreen{
         gbc.anchor = GridBagConstraints.WEST;
         
 
+
         // Title
         gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
         gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0;
@@ -157,7 +158,7 @@ public class SetupScreen extends BaseScreen{
                     (int) endMonth.getValue(),
                     (int) endDay.getValue()
             );
-            app.getCycleManager().initializeCycle(allowance, startDate, endDate);
+            app.initializeCycle(allowance, startDate, endDate);
         }
     }
 

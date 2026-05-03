@@ -2,53 +2,87 @@ package app;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 import control.CycleManager;
+import control.ExpenseManager;
+import control.LimitCalculator;
+import domain.BudgetCycle;
+import domain.Expense;
 import ui.*;
 
 import javax.swing.*;
-import java.util.concurrent.CyclicBarrier;
+import java.time.LocalDate;
+import java.util.List;
 
 public class App {
     private JFrame frame;
     private CycleManager cycleManager;
+    private ExpenseManager expenseManager;
+    private LimitCalculator limitCalculator;
 
-    App()
-    {
+    App() {
+        cycleManager = new CycleManager();
+        expenseManager = new ExpenseManager();
+        limitCalculator = new LimitCalculator();
+
         try {
             UIManager.setLookAndFeel(new FlatDarkLaf());
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         frame = new JFrame("Mizan");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(800,600);
+        frame.setSize(800, 600);
         frame.setResizable(false);
         frame.setVisible(true);
-        //showSetupScreen();
         showDashboardScreen();
     }
-    public void showSetupScreen()
-    {
+
+    public BudgetCycle getActiveCycle() {
+        return cycleManager.getActiveCycle();
+    }
+
+    public BudgetCycle initializeCycle(double allowance, LocalDate start, LocalDate end) {
+        return cycleManager.initializeCycle(allowance, start, end);
+    }
+
+    public Expense logExpense(double amount, int categoryId) {
+        return expenseManager.logExpense(amount, categoryId, cycleManager.getActiveCycle().getId());
+    }
+
+    public List<Expense> getExpenses() {
+        return expenseManager.getExpensesByCycle(cycleManager.getActiveCycle().getId());
+    }
+
+    public double getDailyLimit() {
+        return limitCalculator.calculateDailyLimit(cycleManager.getActiveCycle());
+    }
+
+    public void resetCycle() {
+        cycleManager.resetCycle();
+    }
+
+    public void showSetupScreen() {
         frame.setContentPane(new SetupScreen(this).getPanel());
         frame.revalidate();
     }
-    public void showDashboardScreen()
-    {
+
+    public void showDashboardScreen() {
         frame.setContentPane(new DashboardScreen(this).getPanel());
         frame.revalidate();
     }
-    public void showExpenseLoggingScreen()
-    {
+
+    public void showExpenseLoggingScreen() {
         frame.setContentPane(new ExpenseLoggingScreen(this).getPanel());
         frame.revalidate();
     }
-    public void showHistoryScreen()
-    {
+
+    public void showHistoryScreen() {
         frame.setContentPane(new HistoryScreen(this).getPanel());
         frame.revalidate();
     }
-    public void showSettingsScreen(){
+
+    public void showSettingsScreen() {
         frame.setContentPane(new SettingsScreen(this).getPanel());
         frame.revalidate();
     }
-    public CycleManager getCycleManager(){return cycleManager;}
 }

@@ -15,8 +15,8 @@ public abstract class BaseScreen {
         initComponents();
         initLayout();
     }
-    public JPanel createNavBar(String activeItem)
-    {
+
+    public JPanel createNavBar(String activeItem) {
         JPanel navBar = new JPanel();
         navBar.setLayout(new BoxLayout(navBar, BoxLayout.Y_AXIS));
         navBar.setBackground(new Color(42, 42, 42));
@@ -42,23 +42,20 @@ public abstract class BaseScreen {
 
         navBar.add(logoPanel);
 
-        //navItems
         navBar.add(createNavItem("DashBoard", activeItem.equals("DashBoard"), () -> app.showDashboardScreen()));
         navBar.add(createNavItem("Log Expense", activeItem.equals("Log Expense"), () -> app.showExpenseLoggingScreen()));
         navBar.add(createNavItem("History", activeItem.equals("History"), () -> app.showHistoryScreen()));
         navBar.add(createNavItem("Settings", activeItem.equals("Settings"), () -> app.showSettingsScreen()));
 
-        //navBar.add(Box.createGlue());
         return navBar;
     }
-    private JPanel createNavItem(String text, boolean active, Runnable onClick)
-    {
+
+    private JPanel createNavItem(String text, boolean active, Runnable onClick) {
         JPanel wrapper = new JPanel(new BorderLayout());
         wrapper.setMaximumSize(new Dimension(180, 40));
         wrapper.setBackground(active ? new Color(55, 52, 90) : new Color(42, 42, 42));
         wrapper.setOpaque(true);
-        if(active)
-        {
+        if (active) {
             JPanel indicatorStrip = new JPanel();
             indicatorStrip.setBackground(new Color(127, 119, 221));
             indicatorStrip.setPreferredSize(new Dimension(2, 40));
@@ -82,11 +79,10 @@ public abstract class BaseScreen {
         btn.setFont(new Font("SansSerif", Font.PLAIN, 13));
         btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btn.setOpaque(true);
-
-
         btn.setBackground(active ? new Color(55, 52, 90) : new Color(42, 42, 42));
         return btn;
     }
+
     protected abstract void initComponents();
     protected abstract void initLayout();
 

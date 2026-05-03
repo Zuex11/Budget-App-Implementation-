@@ -11,7 +11,7 @@ public class GaugePanel extends JPanel {
         this.percentage = percentage;
         this.value = value;
         this.unit = unit;
-        setPreferredSize(new Dimension(180, 180));
+        setPreferredSize(new Dimension(220, 220));
         setBackground(new Color(30, 30, 30));
         setOpaque(true);
     }
@@ -24,8 +24,8 @@ public class GaugePanel extends JPanel {
 
         int cx = getWidth() / 2;
         int cy = getHeight() / 2;
-        int radius = 70;
-        int strokeWidth = 10;
+        int radius = 90;
+        int strokeWidth = 12;
 
         // background arc (gray)
         g2.setStroke(new BasicStroke(strokeWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
@@ -37,21 +37,30 @@ public class GaugePanel extends JPanel {
         int angle = (int) (360 * percentage);
         g2.drawArc(cx - radius, cy - radius, radius * 2, radius * 2, 90, -angle);
 
-        // center text
+        // "Today's Limit" label
         g2.setColor(new Color(170, 170, 170));
-        g2.setFont(new Font("SansSerif", Font.PLAIN, 11));
+        g2.setFont(new Font("SansSerif", Font.PLAIN, 18));
         FontMetrics fm = g2.getFontMetrics();
         String label = "Today's Limit";
-        g2.drawString(label, cx - fm.stringWidth(label) / 2, cy - 14);
+        g2.drawString(label, cx - fm.stringWidth(label) / 2, cy - 28);
 
+// value
         g2.setColor(new Color(74, 222, 128));
-        g2.setFont(new Font("SansSerif", Font.BOLD, 22));
+        g2.setFont(new Font("SansSerif", Font.BOLD, 30));
         fm = g2.getFontMetrics();
-        g2.drawString(value, cx - fm.stringWidth(value) / 2, cy + 10);
+        g2.drawString(value, cx - fm.stringWidth(value) / 2, cy + 8);
 
+// unit
         g2.setColor(new Color(170, 170, 170));
-        g2.setFont(new Font("SansSerif", Font.PLAIN, 11));
+        g2.setFont(new Font("SansSerif", Font.PLAIN, 18));
         fm = g2.getFontMetrics();
-        g2.drawString(unit, cx - fm.stringWidth(unit) / 2, cy + 26);
+        g2.drawString(unit, cx - fm.stringWidth(unit) / 2, cy + 36);
     }
+    public void update(double percentage, String value) {
+        this.percentage = percentage;
+        this.value = value;
+        repaint();
+    }
+
+
 }

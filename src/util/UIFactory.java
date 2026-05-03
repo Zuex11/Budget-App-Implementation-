@@ -1,4 +1,6 @@
 package util;
+import org.jfree.chart.JFreeChart;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -66,13 +68,14 @@ public class UIFactory {
 
     public static JButton createPrimaryButton(String text) {
         JButton btn = new JButton(text);
-        btn.setBackground(new Color(220, 220, 220));
-        btn.setForeground(new Color(20, 20, 20));
+        btn.setBackground(new Color(30, 30, 30));
+        btn.setForeground(Color.WHITE);
         btn.setOpaque(true);
-        btn.setBorderPainted(false);
+        btn.setBorderPainted(true);
         btn.setFocusPainted(false);
+        btn.setBorder(BorderFactory.createLineBorder(Color.WHITE, 1, true));
         btn.setFont(btn.getFont().deriveFont(Font.BOLD, 14f));
-        btn.setPreferredSize(new Dimension(0, 38));
+        btn.setPreferredSize(new Dimension(160, 40));
         return btn;
     }
 
