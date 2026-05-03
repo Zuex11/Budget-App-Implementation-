@@ -51,6 +51,7 @@ public class SetupScreen extends BaseScreen{
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.anchor = GridBagConstraints.WEST;
+        
 
 
         // Title
