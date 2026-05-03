@@ -7,6 +7,7 @@ import control.LimitCalculator;
 import domain.BudgetCycle;
 import domain.Expense;
 import ui.*;
+import domain.Category;
 
 import javax.swing.*;
 import java.time.LocalDate;
@@ -76,7 +77,8 @@ public class App {
         frame.revalidate();
     }
 
-    public void showExpenseLoggingScreen() {
+    public void showExpenseLoggingScreen() 
+    {
         frame.setContentPane(new ExpenseLoggingScreen(this).getPanel());
         frame.revalidate();
     }
@@ -86,8 +88,18 @@ public class App {
         frame.revalidate();
     }
 
-    public void showSettingsScreen() {
+    public void showSettingsScreen() 
+    {
         frame.setContentPane(new SettingsScreen(this).getPanel());
         frame.revalidate();
+    }
+
+    public List<Category> getCategories() 
+    {
+        return expenseManager.getCategories();
+    }
+
+    public Category insertCategory(String name) {
+        return expenseManager.insertCategory(name, 0); // 0 for icon for now
     }
 }
