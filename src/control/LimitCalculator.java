@@ -5,7 +5,7 @@ import domain.BudgetCycle;
 
 
 public class LimitCalculator {
-     private DatabaseHelper dbHelper;
+    private DatabaseHelper dbHelper;
 
     public LimitCalculator() {
         this.dbHelper = DatabaseHelper.getInstance();
@@ -20,7 +20,7 @@ public class LimitCalculator {
 
     }
 
-    public double calculateSpentTotal( int cycleId) {
+    public double calculateSpentTotal(int cycleId) {
         return dbHelper.getTotalSpent(cycleId);
     }
 
@@ -30,5 +30,5 @@ public class LimitCalculator {
         cycle.setTotalSpent(totalSpent);
         return calculateDailyLimit(cycle);
     }
-    
+
 }
