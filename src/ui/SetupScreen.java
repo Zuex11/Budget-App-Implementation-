@@ -16,6 +16,8 @@ public class SetupScreen extends BaseScreen{
     private JButton startCycleButton;
     private JButton cancelButton;
     private JLabel errorLabel;
+    private final int  titleFontSize = 25;
+    private final int subTitleFontSize = 18;
 
     public SetupScreen(App app) {
         super(app);
@@ -50,16 +52,17 @@ public class SetupScreen extends BaseScreen{
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.anchor = GridBagConstraints.WEST;
 
+
         // Title
         gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
         gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0;
         gbc.insets = new Insets(25, 20, 0, 20);
-        card.add(UIFactory.createTitleLabel("Set up your budget cycle"), gbc);
+        card.add(UIFactory.createTitleLabel("Set up your budget cycle", titleFontSize), gbc);
 
         // Description
         gbc.gridy = 1;
         gbc.insets = new Insets(4, 20, 10, 20);
-        card.add(UIFactory.createSubLabel("Define your allowance and the period you want to track spending for."), gbc);
+        card.add(UIFactory.createSubLabel("Define your allowance and the period you want to track spending for.", subTitleFontSize), gbc);
 
         // Allowance label
         gbc.gridy = 2;
@@ -122,9 +125,9 @@ public class SetupScreen extends BaseScreen{
         JPanel inner = new JPanel(new GridBagLayout());
         inner.setBackground(AppColors.FIELD);
 
-        JLabel slash1 = UIFactory.createSubLabel("/");
+        JLabel slash1 = UIFactory.createSubLabel("/", subTitleFontSize);
         slash1.setHorizontalAlignment(SwingConstants.CENTER);
-        JLabel slash2 = UIFactory.createSubLabel("/");
+        JLabel slash2 = UIFactory.createSubLabel("/", subTitleFontSize);
         slash2.setHorizontalAlignment(SwingConstants.CENTER);
 
         GridBagConstraints g = new GridBagConstraints();
