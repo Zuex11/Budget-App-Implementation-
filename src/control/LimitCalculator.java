@@ -7,7 +7,7 @@ import domain.BudgetCycle;
 public class LimitCalculator {
      private DatabaseHelper dbHelper;
 
-    LimitCalculator() {
+    public LimitCalculator() {
         this.dbHelper = DatabaseHelper.getInstance();
     }
 

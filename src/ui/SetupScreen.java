@@ -157,7 +157,7 @@ public class SetupScreen extends BaseScreen{
                     (int) endMonth.getValue(),
                     (int) endDay.getValue()
             );
-            app.getCycleManager().initializeCycle(allowance, startDate, endDate);
+            app.initializeCycle(allowance, startDate, endDate);
         }
     }
 

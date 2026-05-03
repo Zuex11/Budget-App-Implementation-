@@ -1,6 +1,7 @@
 package ui;
 
 import app.App;
+import domain.BudgetCycle;
 import org.jfree.chart.plot.PiePlot;
 import org.jfree.chart.ui.RectangleEdge;
 import ui.BaseScreen;
@@ -21,6 +22,7 @@ public class DashboardScreen extends BaseScreen {
     private JLabel dailyLimitLabel;
     private JLabel totalSpentLabel;
     private JLabel remainingBalanceLabel;
+    private double spentPercentage;
     private JFreeChart spendingPieChart;
     private JButton logExpense;
     private JLabel budgetStatusLabel;
@@ -36,12 +38,13 @@ public class DashboardScreen extends BaseScreen {
     @Override
     protected void initComponents()
     {
+
         dailyLimitLabel = UIFactory.createSubLabel("Daily limit:", subTitleFontSize);
         totalSpentLabel = UIFactory.createSubLabel("Total spent:", subTitleFontSize);
         remainingBalanceLabel = UIFactory.createSubLabel("Remaining balance:", subTitleFontSize);
         budgetStatusLabel = UIFactory.createSubLabel("Budget status:", subTitleFontSize);
         logExpense = UIFactory.createPrimaryButton("Log expense");
-        gauge = new GaugePanel(0.65, "93", "EGP");
+        spentPercentage = app.getActiveCycle().getSpentPercentage();        gauge = new GaugePanel(spentPercentage, dailyLimitLabel.getText(), "EGP");
 
         budgetPieDataset = new DefaultPieDataset();
         budgetPieDataset.setValue("Food", 45);
@@ -125,20 +128,22 @@ public class DashboardScreen extends BaseScreen {
 
         return chartPanel;
     }
-    public void loadDashboardData()
-    {
+    public void loadDashboardData() {
+        BudgetCycle cycle = app.getActiveCycle();
+        gauge.update(cycle.getSpentPercentage(), String.valueOf(app.getDailyLimit()));
+        dailyLimitLabel.setText("Daily limit: " + app.getDailyLimit());
+        remainingBalanceLabel.setText("Remaining: " + cycle.getRemainingBalance());
+    }
 
+    public void updateDailyLimit(double limit) {
+        dailyLimitLabel.setText("Daily limit: " + limit);
     }
-    public void updateDailyLimit(double limit)
-    {
+
+    public void showBudgetWarning(String message) {
+        JOptionPane.showMessageDialog(panel, message, "Budget Warning", JOptionPane.WARNING_MESSAGE);
     }
-    public void updatePieChart(Map data)
-    {
-    }
-    public void showBudgetWarning(String message)
-    {
-    }
-    public void navigateToExpenseLogging()
-    {
+
+    public void navigateToExpenseLogging() {
+        app.showExpenseLoggingScreen();
     }
 }

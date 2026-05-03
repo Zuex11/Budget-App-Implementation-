@@ -10,7 +10,7 @@ import java.time.LocalDate;
 public class CycleManager {
     private DatabaseHelper dbHelper;
 
-    CycleManager() {
+    public CycleManager() {
         this.dbHelper = DatabaseHelper.getInstance();
     }
 

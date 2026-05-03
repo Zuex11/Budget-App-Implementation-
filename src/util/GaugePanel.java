@@ -56,4 +56,11 @@ public class GaugePanel extends JPanel {
         fm = g2.getFontMetrics();
         g2.drawString(unit, cx - fm.stringWidth(unit) / 2, cy + 36);
     }
+    public void update(double percentage, String value) {
+        this.percentage = percentage;
+        this.value = value;
+        repaint();
+    }
+
+
 }
