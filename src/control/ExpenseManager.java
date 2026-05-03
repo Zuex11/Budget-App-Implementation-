@@ -49,4 +49,18 @@ public class ExpenseManager {
     public List<Expense> getExpensesByCategory(int cycleId, int categoryId) {
         return dbHelper.getExpensesByCategory(cycleId, categoryId);
     }
+
+    public Category insertCategory(String name, int iconResId) 
+    {
+        Category category = new Category(0, name, iconResId);
+        long id = dbHelper.insertCategory(category);
+        category = new Category((int) id, name, iconResId);
+        return category;
+    }
+
+    public List<Category> getCategories() 
+    {
+        return dbHelper.getAllCategories();
+    }
+    
 }

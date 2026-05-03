@@ -3,26 +3,43 @@ package ui;
 import app.App;
 import javax.swing.*;
 import java.awt.*;
-import domain.Category; 
+import domain.Category;
 import util.UIFactory;
 import util.AppColors;
+import java.util.List;
 
-public class ExpenseLoggingScreen extends BaseScreen
-{
+public class ExpenseLoggingScreen extends BaseScreen {
     private JTextField amountField;
     private JComboBox<Category> categoryComboBox;
     private JButton saveButton;
     private JButton cancelButton;
     private JLabel errorLabel;
+    private JTextField newCategoryField;
+    private JButton addCategoryButton;
 
     private Category selectedCategory;
 
-    public ExpenseLoggingScreen(App app) {super(app);}
+    public ExpenseLoggingScreen(App app) {
+        super(app);
+    }
+
+    private void loadCategories() {
+        categoryComboBox.removeAllItems();
+        List<Category> categories = app.getCategories();
+        for (Category c : categories) {
+            categoryComboBox.addItem(c);
+        }
+        selectedCategory = (Category) categoryComboBox.getSelectedItem();
+    }
 
     @Override
-    protected void initComponents()
-    {
+    protected void initComponents() {
         categoryComboBox = new JComboBox<>();
+
+        categoryComboBox.addActionListener(e -> {
+            selectedCategory = (Category) categoryComboBox.getSelectedItem();
+        });
+
         amountField = UIFactory.createTextField("e.g.");
         saveButton = UIFactory.createPrimaryButton("Save");
         cancelButton = UIFactory.createSecondaryButton("Cancel");
@@ -30,36 +47,48 @@ public class ExpenseLoggingScreen extends BaseScreen
 
         saveButton.addActionListener(e -> onSaveClicked());
         cancelButton.addActionListener(e -> app.showDashboardScreen());
+
+        newCategoryField = UIFactory.createTextField("New category name");
+        addCategoryButton = UIFactory.createSecondaryButton("Add");
+        addCategoryButton.addActionListener(e -> {
+            String name = newCategoryField.getText().trim();
+            if (!name.isEmpty() && !name.equals("New category name")) {
+                app.insertCategory(name);
+                loadCategories();
+                newCategoryField.setText("");
+            }
+        });
+
+        loadCategories();
     }
 
     @Override
-    protected void initLayout()
-    {
+    protected void initLayout() {
         panel = new JPanel(new BorderLayout());
         panel.setBackground(AppColors.BACKGROUND);
         panel.add(createNavBar("Log Expense"), BorderLayout.WEST);
 
-        JPanel card = UIFactory.createCard(420, 360);
+        JPanel card = UIFactory.createCard(420, 430);
 
         GridBagConstraints gbc = new GridBagConstraints();
 
         gbc.anchor = GridBagConstraints.CENTER;
-        gbc.gridx = 0 ;
-        gbc.gridy = 0 ;
-        gbc.gridwidth = 2 ;
-        gbc.fill = GridBagConstraints.NONE ;
-        gbc.weightx = 0 ;
-        gbc.insets = new Insets(25, 20, 0, 20) ;
-        card.add(UIFactory.createTitleLabel("Log Expense",15), gbc) ;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.weightx = 0;
+        gbc.insets = new Insets(25, 20, 0, 20);
+        card.add(UIFactory.createTitleLabel("Log Expense", 15), gbc);
 
-        gbc.gridy = 1 ;
-        gbc.insets = new Insets(4, 20, 10, 20) ;
+        gbc.gridy = 1;
+        gbc.insets = new Insets(4, 20, 10, 20);
 
-        card.add(UIFactory.createSubLabel("Enter the amount and select a category.",13), gbc) ;
-        JPanel centerPanel = new JPanel(new GridBagLayout()) ;
+        card.add(UIFactory.createSubLabel("Enter the amount and select a category.", 13), gbc);
+        JPanel centerPanel = new JPanel(new GridBagLayout());
 
-        centerPanel.add(card, new GridBagConstraints()) ;
-        panel.add(centerPanel, BorderLayout.CENTER) ;
+        centerPanel.add(card, new GridBagConstraints());
+        panel.add(centerPanel, BorderLayout.CENTER);
 
         gbc.anchor = GridBagConstraints.WEST;
         gbc.gridy = 2;
@@ -87,24 +116,42 @@ public class ExpenseLoggingScreen extends BaseScreen
         card.add(categoryComboBox, gbc);
 
         gbc.gridy = 6;
+        gbc.gridwidth = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 0.7;
+        gbc.insets = new Insets(0, 20, 10, 5);
+        card.add(newCategoryField, gbc);
+
+        gbc.gridx = 1;
+        gbc.weightx = 0.2;
+        gbc.insets = new Insets(0, 0, 10, 20);
+        card.add(addCategoryButton, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridwidth = 2;
+        gbc.gridy = 8;
         gbc.fill = GridBagConstraints.NONE;
         gbc.weightx = 0;
         gbc.insets = new Insets(0, 20, 5, 20);
         card.add(errorLabel, gbc);
 
-        gbc.gridy = 7;
+        gbc.gridx = 0;
+        gbc.gridwidth = 2;
+        gbc.gridy = 9;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0;
         gbc.insets = new Insets(5, 20, 5, 20);
         card.add(cancelButton, gbc);
 
-        gbc.gridy = 8;
+        gbc.gridx = 0;
+        gbc.gridwidth = 2;
+        gbc.gridy = 10;
         gbc.insets = new Insets(0, 20, 25, 20);
         card.add(saveButton, gbc);
+
     }
 
-    public boolean validateInputs() 
-    {
+    public boolean validateInputs() {
         String amountText = amountField.getText().trim();
         if (amountText.isEmpty()) {
             showError("Amount is required.");
@@ -128,27 +175,25 @@ public class ExpenseLoggingScreen extends BaseScreen
         return true;
     }
 
-    public void showError(String message) 
-    {
+    public void showError(String message) {
         errorLabel.setText(message);
         errorLabel.setVisible(true);
-    } 
+    }
 
-    public void onCategorySelected(Category category) 
-    {
+    public void onCategorySelected(Category category) {
         selectedCategory = category;
     }
 
-    public void showSuccessAndReturn() 
-    {
+    public void showSuccessAndReturn() {
         app.showDashboardScreen();
     }
 
-    public void onSaveClicked() 
-    {
-        if (validateInputs()) 
-        {
-            // TODO: call app.getExpenseManager().logExpense(...) when ExpenseManager is ready
+    public void onSaveClicked() {
+        if (validateInputs()) {
+            double amount = Double.parseDouble(amountField.getText().trim());
+            int categoryId = selectedCategory.getId();
+            int cycleId = app.getActiveCycle().getId();
+            app.logExpense(amount, categoryId);
             showSuccessAndReturn();
         }
     }
