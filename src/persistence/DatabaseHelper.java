@@ -385,4 +385,26 @@ public class DatabaseHelper
 
         return -1;
     }
+
+    public void savePin(String hashedPin) {
+    try {
+        Statement stmt = connection.createStatement();
+        stmt.execute("CREATE TABLE IF NOT EXISTS pin (hashed_pin TEXT NOT NULL)");
+        connection.createStatement().execute("DELETE FROM pin");
+        PreparedStatement ps = connection.prepareStatement("INSERT INTO pin VALUES (?)");
+        ps.setString(1, hashedPin);
+        ps.executeUpdate();
+    } catch (SQLException e) { e.printStackTrace(); }
+   }
+
+    public String getPin() {
+    try {
+        Statement stmt = connection.createStatement();
+        stmt.execute("CREATE TABLE IF NOT EXISTS pin (hashed_pin TEXT NOT NULL)");
+        ResultSet rs = connection.createStatement().executeQuery("SELECT hashed_pin FROM pin");
+        if (rs.next()) return rs.getString(1);
+    } 
+    catch (SQLException e) { e.printStackTrace(); }
+    return null;
+    }
 }
