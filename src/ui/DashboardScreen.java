@@ -4,19 +4,16 @@ import app.App;
 import domain.BudgetCycle;
 import org.jfree.chart.plot.PiePlot;
 import org.jfree.chart.ui.RectangleEdge;
-import ui.BaseScreen;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.ChartPanel;
 import org.jfree.data.general.DefaultPieDataset;
 import org.jfree.chart.ChartFactory;
-import util.AppColors;
 import util.GaugePanel;
 import util.UIFactory;
 
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Map;
 
 public class DashboardScreen extends BaseScreen {
     private JLabel dailyLimitLabel;
@@ -24,7 +21,7 @@ public class DashboardScreen extends BaseScreen {
     private JLabel remainingBalanceLabel;
     private double spentPercentage;
     private JFreeChart spendingPieChart;
-    private JButton logExpense;
+    private JButton logExpenseBtn;
     private JLabel budgetStatusLabel;
     private int titleFontSize = 25;
     private int subTitleFontSize = 18;
@@ -43,7 +40,8 @@ public class DashboardScreen extends BaseScreen {
         totalSpentLabel = UIFactory.createSubLabel("Total spent:", subTitleFontSize);
         remainingBalanceLabel = UIFactory.createSubLabel("Remaining balance:", subTitleFontSize);
         budgetStatusLabel = UIFactory.createSubLabel("Budget status:", subTitleFontSize);
-        logExpense = UIFactory.createPrimaryButton("Log expense");
+        logExpenseBtn = UIFactory.createPrimaryButton("Log expense");
+        logExpenseBtn.addActionListener(e -> app.showExpenseLoggingScreen());
 
         BudgetCycle cycle = app.getActiveCycle();
         if (cycle != null) {
@@ -96,7 +94,7 @@ public class DashboardScreen extends BaseScreen {
 
         gbc.gridy = 1;
         gbc.insets = new Insets(10, 0, 20, 0);
-        rightSection.add(logExpense, gbc);
+        rightSection.add(logExpenseBtn, gbc);
 
         mainContent.add(leftSection);
         mainContent.add(rightSection);
