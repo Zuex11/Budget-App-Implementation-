@@ -33,18 +33,25 @@ public class DashboardScreen extends BaseScreen {
 
 
     public DashboardScreen(App app) {
-    super(app);
+        super(app);
     }
+
     @Override
-    protected void initComponents()
-    {
+    protected void initComponents() {
 
         dailyLimitLabel = UIFactory.createSubLabel("Daily limit:", subTitleFontSize);
         totalSpentLabel = UIFactory.createSubLabel("Total spent:", subTitleFontSize);
         remainingBalanceLabel = UIFactory.createSubLabel("Remaining balance:", subTitleFontSize);
         budgetStatusLabel = UIFactory.createSubLabel("Budget status:", subTitleFontSize);
         logExpense = UIFactory.createPrimaryButton("Log expense");
-        spentPercentage = app.getActiveCycle().getSpentPercentage();        gauge = new GaugePanel(spentPercentage, dailyLimitLabel.getText(), "EGP");
+
+        BudgetCycle cycle = app.getActiveCycle();
+        if (cycle != null) {
+            spentPercentage = cycle.getSpentPercentage();
+        } else {
+            spentPercentage = 0;
+        }
+        gauge = new GaugePanel(spentPercentage, dailyLimitLabel.getText(), "EGP");
 
         budgetPieDataset = new DefaultPieDataset();
         budgetPieDataset.setValue("Food", 45);
@@ -59,9 +66,9 @@ public class DashboardScreen extends BaseScreen {
                 false
         );
     }
+
     @Override
-    protected void initLayout()
-    {
+    protected void initLayout() {
         panel = new JPanel(new BorderLayout());
         panel.setBackground(new Color(30, 30, 30));
 
@@ -77,11 +84,13 @@ public class DashboardScreen extends BaseScreen {
 
         GridBagConstraints gbc = new GridBagConstraints();
 
-        gbc.gridx = 0; gbc.gridy = 0;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
         gbc.insets = new Insets(20, 20, 20, 20);
         leftSection.add(createPieChart(), gbc);
 
-        gbc.gridx = 0; gbc.gridy = 0;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
         gbc.insets = new Insets(20, 0, 10, 0);
         rightSection.add(gauge, gbc);
 
@@ -95,6 +104,7 @@ public class DashboardScreen extends BaseScreen {
         panel.add(createNavBar("DashBoard"), BorderLayout.WEST);
         panel.add(mainContent, BorderLayout.CENTER);
     }
+
     private ChartPanel createPieChart() {
         spendingPieChart = ChartFactory.createPieChart(null, budgetPieDataset, true, false, false);
 
@@ -128,8 +138,10 @@ public class DashboardScreen extends BaseScreen {
 
         return chartPanel;
     }
+
     public void loadDashboardData() {
         BudgetCycle cycle = app.getActiveCycle();
+        if (cycle == null) return;
         gauge.update(cycle.getSpentPercentage(), String.valueOf(app.getDailyLimit()));
         dailyLimitLabel.setText("Daily limit: " + app.getDailyLimit());
         remainingBalanceLabel.setText("Remaining: " + cycle.getRemainingBalance());

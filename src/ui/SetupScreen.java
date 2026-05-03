@@ -159,6 +159,7 @@ public class SetupScreen extends BaseScreen{
                     (int) endDay.getValue()
             );
             app.initializeCycle(allowance, startDate, endDate);
+            app.showDashboardScreen();
         }
     }
 

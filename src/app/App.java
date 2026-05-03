@@ -34,7 +34,12 @@ public class App {
         frame.setSize(800, 600);
         frame.setResizable(false);
         frame.setVisible(true);
-        showDashboardScreen();
+
+        if (cycleManager.getActiveCycle() == null) {
+            showSetupScreen();
+        } else {
+            showDashboardScreen();
+        }
     }
 
     public BudgetCycle getActiveCycle() {
