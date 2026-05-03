@@ -67,8 +67,7 @@ public class DashboardScreen extends BaseScreen {
 
     @Override
     protected void initLayout() {
-        panel = new JPanel(new BorderLayout());
-        panel.setBackground(new Color(30, 30, 30));
+        panel = UIFactory.createMainPanel(new BorderLayout());
 
         JPanel mainContent = new JPanel(new GridLayout(1, 2));
         mainContent.setBackground(new Color(30, 30, 30));
