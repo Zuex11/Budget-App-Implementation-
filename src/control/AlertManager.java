@@ -6,11 +6,12 @@ import domain.*;
 public class AlertManager {
 
     private DatabaseHelper dbHelper;
-    AlertManager() {
+
+    public AlertManager() {
         this.dbHelper = DatabaseHelper.getInstance();
     }
 
-    public void sendNotification( String message) {
+    public void sendNotification(String message) {
 
         System.out.println("ALERT: " + message);  // replace system output with actual notification 
 
@@ -29,11 +30,10 @@ public class AlertManager {
     public void checkThreshold(BudgetCycle cycle) {
         double spentPercentage = cycle.getSpentPercentage();
         if (spentPercentage >= 100) {
-            dbHelper.updateCycleStatus(cycle.getId() , CycleStatus.EXHAUSTED);
+            dbHelper.updateCycleStatus(cycle.getId(), CycleStatus.EXHAUSTED);
             sendNotification("Budget Exhausted. No funds remaining.");
-        }
-        else if (spentPercentage >= 80 && !hasAlertBeenSent(cycle.getId())){
-            dbHelper.updateCycleStatus(cycle.getId() , CycleStatus.NEAR_LIMIT);
+        } else if (spentPercentage >= 80 && !hasAlertBeenSent(cycle.getId())) {
+            dbHelper.updateCycleStatus(cycle.getId(), CycleStatus.NEAR_LIMIT);
             sendNotification("Warning: You have used 80% of your allowance.");
         }
     }

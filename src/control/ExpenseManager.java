@@ -1,5 +1,52 @@
 package control;
 
-public class ExpenseManager {
+import domain.*;
+import persistence.DatabaseHelper;
 
+import java.util.List;
+
+public class ExpenseManager {
+    private DatabaseHelper dbHelper;
+    private AlertManager alertManager;
+    private LimitCalculator limitCalculator;
+
+    public ExpenseManager() {
+        this.dbHelper = DatabaseHelper.getInstance();
+        this.alertManager = new AlertManager();
+        this.limitCalculator = new LimitCalculator();
+    }
+
+    public Expense logExpense(double amount, int categoryId, int cycleId) {
+        Expense expense = new Expense(amount, categoryId, cycleId);
+        long id = dbHelper.insertExpense(expense);
+        expense.setId((int) id);
+
+        double newDailyLimit = limitCalculator.recalculate(cycleId);
+
+        BudgetCycle cycle = dbHelper.getBudgetCycle();
+        double totalSpent = limitCalculator.calculateSpentTotal(cycleId);
+        cycle.setTotalSpent(totalSpent);
+
+        alertManager.checkThreshold(cycle);
+
+        return expense;
+    }
+
+    public void editExpense(int id, double amount, int categoryId) {
+        Expense expense = new Expense(amount, categoryId, 0);
+        expense.setId(id);
+        dbHelper.updateExpense(expense);
+    }
+
+    public void deleteExpense(int id) {
+        dbHelper.deleteExpense(id);
+    }
+
+    public List<Expense> getExpensesByCycle(int cycleId) {
+        return dbHelper.getAllExpenses(cycleId);
+    }
+
+    public List<Expense> getExpensesByCategory(int cycleId, int categoryId) {
+        return dbHelper.getExpensesByCategory(cycleId, categoryId);
+    }
 }
