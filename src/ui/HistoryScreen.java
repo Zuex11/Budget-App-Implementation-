@@ -36,10 +36,10 @@ public class HistoryScreen  extends BaseScreen
         titleLabel = UIFactory.createTitleLabel("Expense", titleFontSize);
         String thisMonthAndYear = LocalDate.now().getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH) +" "+ Integer.toString(LocalDate.now().getYear());
         subTitleLabel = UIFactory.createSubLabel("All transactions for " + thisMonthAndYear, subTitleFontSize);
-        transactionTableModel = new DefaultTableModel(
-                new String[]{"Date", "Category", "Amount"}, 0
-        );
+        transactionTableModel = initTransactionTableModel();
+        transactionTableModel.addRow(new Object[]{"april", "lol", "6"});
         transactionTable = new JTable(transactionTableModel);
+
     }
 
     @Override
@@ -68,6 +68,15 @@ public class HistoryScreen  extends BaseScreen
 
         panel.add(mainContent,  BorderLayout.CENTER);
         panel.add(createNavBar("History"), BorderLayout.WEST);
+    }
+    private DefaultTableModel initTransactionTableModel()
+    {
+        transactionTableModel = new DefaultTableModel();
+        transactionTableModel.addColumn("Date");
+        transactionTableModel.addColumn("Category");
+        transactionTableModel.addColumn("Amount");
+        transactionTableModel.addRow(new Object[]{"Date", "Category", "Amount"});
+        return transactionTableModel;
     }
     public void loadTransactions()
     {
