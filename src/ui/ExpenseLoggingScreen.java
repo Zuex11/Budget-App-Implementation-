@@ -215,6 +215,7 @@ public class ExpenseLoggingScreen extends BaseScreen {
             int categoryId = selectedCategory.getId();
             int cycleId = app.getActiveCycle().getId();
             app.logExpense(amount, categoryId);
+            app.getLimitCalculator().recalculate(app.getActiveCycle().getId());
             showSuccessAndReturn();
         }
     }
