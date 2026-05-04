@@ -1,12 +1,15 @@
 package app;
 
 import com.formdev.flatlaf.FlatDarkLaf;
+
+import control.AuthManager;
 import control.CycleManager;
 import control.ExpenseManager;
 import control.LimitCalculator;
 import domain.BudgetCycle;
 import domain.Expense;
 import ui.*;
+import domain.Category;
 
 import javax.swing.*;
 import java.time.LocalDate;
@@ -17,11 +20,13 @@ public class App {
     private CycleManager cycleManager;
     private ExpenseManager expenseManager;
     private LimitCalculator limitCalculator;
+    private AuthManager authManager;
 
     App() {
         cycleManager = new CycleManager();
         expenseManager = new ExpenseManager();
         limitCalculator = new LimitCalculator();
+        authManager = new AuthManager();
 
         try {
             UIManager.setLookAndFeel(new FlatDarkLaf());
@@ -35,9 +40,15 @@ public class App {
         frame.setResizable(false);
         frame.setVisible(true);
 
-        if (cycleManager.getActiveCycle() == null) {
+        if (authManager.hasPin()) {
+            showLockScreen();
+        }
+
+        else if (cycleManager.getActiveCycle() == null) {
             showSetupScreen();
-        } else {
+        }
+
+        else {
             showDashboardScreen();
         }
     }
@@ -89,5 +100,22 @@ public class App {
     public void showSettingsScreen() {
         frame.setContentPane(new SettingsScreen(this).getPanel());
         frame.revalidate();
+    }
+
+    public void showLockScreen() {
+        frame.setContentPane(new LockScreen(this).getPanel());
+        frame.revalidate();
+    }
+
+    public List<Category> getCategories() {
+        return expenseManager.getCategories();
+    }
+
+    public Category insertCategory(String name) {
+        return expenseManager.insertCategory(name, 0);
+    }
+
+    public AuthManager getAuthManager() {
+        return authManager;
     }
 }
