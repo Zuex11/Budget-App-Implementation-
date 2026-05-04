@@ -2,6 +2,8 @@ package ui;
 
 import app.App;
 import domain.BudgetCycle;
+import domain.Category;
+import domain.Expense;
 import org.jfree.chart.plot.PiePlot;
 import org.jfree.chart.ui.RectangleEdge;
 import org.jfree.chart.JFreeChart;
@@ -11,9 +13,9 @@ import org.jfree.chart.ChartFactory;
 import util.GaugePanel;
 import util.UIFactory;
 
-
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 
 public class DashboardScreen extends BaseScreen {
     private JLabel dailyLimitLabel;
@@ -28,41 +30,28 @@ public class DashboardScreen extends BaseScreen {
     private GaugePanel gauge;
     private DefaultPieDataset budgetPieDataset;
 
-
     public DashboardScreen(App app) {
         super(app);
     }
 
     @Override
     protected void initComponents() {
-
         dailyLimitLabel = UIFactory.createSubLabel("Daily limit:", subTitleFontSize);
         totalSpentLabel = UIFactory.createSubLabel("Total spent:", subTitleFontSize);
         remainingBalanceLabel = UIFactory.createSubLabel("Remaining balance:", subTitleFontSize);
         budgetStatusLabel = UIFactory.createSubLabel("Budget status:", subTitleFontSize);
         logExpenseBtn = UIFactory.createPrimaryButton("Log expense");
-        logExpenseBtn.addActionListener(e -> app.showExpenseLoggingScreen());
+        logExpenseBtn.addActionListener(e -> onLogExpenseClicked());
 
         BudgetCycle cycle = app.getActiveCycle();
-        if (cycle != null) {
-            spentPercentage = cycle.getSpentPercentage();
-        } else {
-            spentPercentage = 0;
-        }
-        gauge = new GaugePanel(spentPercentage, dailyLimitLabel.getText(), "EGP");
+        spentPercentage = (cycle != null) ? cycle.getSpentPercentage() / 100.0 : 0;
+        gauge = new GaugePanel(spentPercentage, "0", "EGP");
 
+        // Initialize dataset and chart BEFORE loadDashboardData
         budgetPieDataset = new DefaultPieDataset();
-        budgetPieDataset.setValue("Food", 45);
-        budgetPieDataset.setValue("Transportation", 30);
-        budgetPieDataset.setValue("Entertainment", 25);
+        spendingPieChart = ChartFactory.createPieChart(null, budgetPieDataset, true, false, false);
 
-        spendingPieChart = ChartFactory.createPieChart(
-                null,
-                budgetPieDataset,
-                true,   // legend ON
-                false,
-                false
-        );
+        loadDashboardData();
     }
 
     @Override
@@ -81,13 +70,11 @@ public class DashboardScreen extends BaseScreen {
 
         GridBagConstraints gbc = new GridBagConstraints();
 
-        gbc.gridx = 0;
-        gbc.gridy = 0;
+        gbc.gridx = 0; gbc.gridy = 0;
         gbc.insets = new Insets(20, 20, 20, 20);
         leftSection.add(createPieChart(), gbc);
 
-        gbc.gridx = 0;
-        gbc.gridy = 0;
+        gbc.gridx = 0; gbc.gridy = 0;
         gbc.insets = new Insets(20, 0, 10, 0);
         rightSection.add(gauge, gbc);
 
@@ -103,8 +90,6 @@ public class DashboardScreen extends BaseScreen {
     }
 
     private ChartPanel createPieChart() {
-        spendingPieChart = ChartFactory.createPieChart(null, budgetPieDataset, true, false, false);
-
         spendingPieChart.setBackgroundPaint(new Color(30, 30, 30));
         spendingPieChart.getLegend().setBackgroundPaint(new Color(30, 30, 30));
         spendingPieChart.getLegend().setItemPaint(Color.WHITE);
@@ -118,9 +103,6 @@ public class DashboardScreen extends BaseScreen {
         plot.setSectionOutlinesVisible(false);
         plot.setInteriorGap(0.05);
         plot.setCircular(true);
-        plot.setSectionPaint("Food", new Color(155, 191, 224));
-        plot.setSectionPaint("Transportation", new Color(155, 191, 224));
-        plot.setSectionPaint("Entertainment", new Color(232, 160, 154));
         plot.setLabelGenerator(null);
 
         ChartPanel chartPanel = new ChartPanel(spendingPieChart);
@@ -136,12 +118,54 @@ public class DashboardScreen extends BaseScreen {
         return chartPanel;
     }
 
+    private void refreshPieChart() {
+        budgetPieDataset.clear();
+        BudgetCycle cycle = app.getActiveCycle();
+        if (cycle == null) return;
+
+        List<Category> categories = app.getCategories();
+        Color[] palette = {
+                new Color(155, 191, 224),
+                new Color(232, 160, 154),
+                new Color(144, 208, 144),
+                new Color(255, 204, 128),
+                new Color(186, 155, 224)
+        };
+
+        PiePlot plot = (PiePlot) spendingPieChart.getPlot();
+        int i = 0;
+        for (Category cat : categories) {
+            List<Expense> expenses = app.getExpensesByCategory(cat.getId());
+            double total = expenses.stream().mapToDouble(Expense::getAmount).sum();
+            if (total > 0) {
+                budgetPieDataset.setValue(cat.getName(), total);
+                plot.setSectionPaint(cat.getName(), palette[i % palette.length]);
+                i++;
+            }
+        }
+    }
     public void loadDashboardData() {
         BudgetCycle cycle = app.getActiveCycle();
         if (cycle == null) return;
-        gauge.update(cycle.getSpentPercentage(), String.valueOf(app.getDailyLimit()));
-        dailyLimitLabel.setText("Daily limit: " + app.getDailyLimit());
+
+        double totalSpent = app.getLimitCalculator().calculateSpentTotal(cycle.getId());
+        cycle.setTotalSpent(totalSpent);
+
+        double dailyLimit = app.getDailyLimit();
+
+        // Gauge fills based on today's spending vs daily limit
+        double todaySpent = app.getTodaySpent(); // need this in App
+        double percentage = (dailyLimit > 0) ? todaySpent / dailyLimit : 0;
+
+        gauge.update(percentage, String.valueOf(dailyLimit));
+        dailyLimitLabel.setText("Daily limit: " + dailyLimit);
         remainingBalanceLabel.setText("Remaining: " + cycle.getRemainingBalance());
+
+        refreshPieChart();
+    }
+
+    private void onLogExpenseClicked() {
+        app.showExpenseLoggingScreen();
     }
 
     public void updateDailyLimit(double limit) {

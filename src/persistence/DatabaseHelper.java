@@ -407,4 +407,16 @@ public class DatabaseHelper
     catch (SQLException e) { e.printStackTrace(); }
     return null;
     }
+    public double getTodaySpent(int cycleId) {
+        String sql = "SELECT SUM(amount) FROM expense WHERE cycle_id = ? " +
+                "AND timestamp LIKE ? ";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, cycleId);
+            ps.setString(2, java.time.LocalDate.now().toString() + "%");
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getDouble(1);
+        } catch (SQLException e) { e.printStackTrace(); }
+        return 0;
+    }
 }

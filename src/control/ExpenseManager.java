@@ -62,5 +62,7 @@ public class ExpenseManager {
     {
         return dbHelper.getAllCategories();
     }
-    
+    public double getTodaySpent(int cycleId) {
+        return dbHelper.getTodaySpent(cycleId);
+    }
 }

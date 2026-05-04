@@ -70,7 +70,8 @@ public class App {
     }
 
     public double getDailyLimit() {
-        return limitCalculator.calculateDailyLimit(cycleManager.getActiveCycle());
+        BudgetCycle cycle = cycleManager.getActiveCycle();
+        return Math.ceil(limitCalculator.recalculate(cycle.getId()));
     }
 
     public void resetCycle() {
@@ -117,5 +118,22 @@ public class App {
 
     public AuthManager getAuthManager() {
         return authManager;
+    }
+    public LimitCalculator getLimitCalculator()
+    {
+        return limitCalculator;
+    }
+    public List<Expense> getExpensesByCategory(int categoryId) {
+        return expenseManager.getExpensesByCategory(cycleManager.getActiveCycle().getId(), categoryId);
+    }
+    public void editExpense(int id, double amount, int categoryId) {
+        expenseManager.editExpense(id, amount, categoryId);
+    }
+
+    public void deleteExpense(int id) {
+        expenseManager.deleteExpense(id);
+    }
+    public double getTodaySpent() {
+        return expenseManager.getTodaySpent(cycleManager.getActiveCycle().getId());
     }
 }
