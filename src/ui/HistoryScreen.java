@@ -1,10 +1,14 @@
 package ui;
 
 import app.App;
+import util.AmountRenderer;
+import util.CategoryPillRenderer;
+import util.DefaultDarkRenderer;
 import util.UIFactory;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
@@ -37,7 +41,6 @@ public class HistoryScreen  extends BaseScreen
         String thisMonthAndYear = LocalDate.now().getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH) +" "+ Integer.toString(LocalDate.now().getYear());
         subTitleLabel = UIFactory.createSubLabel("All transactions for " + thisMonthAndYear, subTitleFontSize);
         transactionTableModel = initTransactionTableModel();
-        transactionTableModel.addRow(new Object[]{"april", "lol", "6"});
         transactionTable = new JTable(transactionTableModel);
 
     }
@@ -61,8 +64,10 @@ public class HistoryScreen  extends BaseScreen
 
         gbc.gridy = 2;
         gbc.weighty = 1.0;
-
-        mainContent.add(transactionTable, gbc);
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.insets = new Insets(20, 20, 20, 20);
+        JScrollPane scrollPane = styleTransactionTable(transactionTable); // call it here
+        mainContent.add(scrollPane, gbc);
 
 //        mainContent.add(new JPanel() {{ setOpaque(false); }}, gbc);
 
@@ -71,13 +76,48 @@ public class HistoryScreen  extends BaseScreen
     }
     private DefaultTableModel initTransactionTableModel()
     {
-        transactionTableModel = new DefaultTableModel();
-        transactionTableModel.addColumn("Date");
-        transactionTableModel.addColumn("Category");
-        transactionTableModel.addColumn("Amount");
-        transactionTableModel.addRow(new Object[]{"Date", "Category", "Amount"});
+        transactionTableModel =  new DefaultTableModel(
+            new String[]{"Description", "Category", "Date", "Amount"}, 0
+    ) {
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return false;
+        }
+    };
+        transactionTableModel.addRow(new Object[]{"Groceries", "Food", "Apr 28, 2026", "350 EGP"});
+        transactionTableModel.addRow(new Object[]{"Uber ride", "Transport", "Apr 27, 2026", "120 EGP"});
+        transactionTableModel.addRow(new Object[]{"Pharmacy", "Health", "Apr 26, 2026", "75 EGP"});
+        transactionTableModel.addRow(new Object[]{"Netflix", "Entertainment", "Apr 25, 2026", "180 EGP"});
         return transactionTableModel;
     }
+    private JScrollPane styleTransactionTable(JTable transactionTable)
+    {
+        transactionTable.getColumnModel().getColumn(0).setCellRenderer(new DefaultDarkRenderer());
+        transactionTable.getColumnModel().getColumn(1).setCellRenderer(new CategoryPillRenderer());
+        transactionTable.getColumnModel().getColumn(2).setCellRenderer(new DefaultDarkRenderer());
+        transactionTable.getColumnModel().getColumn(3).setCellRenderer(new AmountRenderer());
+
+        transactionTable.setBackground(new Color(42, 42, 42));
+        transactionTable.setForeground(Color.WHITE);
+        transactionTable.setSelectionBackground(new Color(83, 74, 183));
+        transactionTable.setRowHeight(48);
+        transactionTable.setShowGrid(false);
+        transactionTable.setShowGrid(false);
+        transactionTable.setIntercellSpacing(new Dimension(0, 0));
+        transactionTable.setFont(new Font("Arial", Font.PLAIN, 13));
+
+        JTableHeader header = transactionTable.getTableHeader();
+        header.setBackground(new Color(30, 30, 30));
+        header.setForeground(new Color(170, 170, 170));
+        header.setFont(new Font("Arial", Font.PLAIN, 13));
+
+        JScrollPane scrollPane = new JScrollPane(transactionTable);
+        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(58, 58, 58)));
+        scrollPane.getViewport().setBackground(new Color(42, 42, 42));
+        return scrollPane;
+
+    }
+
     public void loadTransactions()
     {
 
