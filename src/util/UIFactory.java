@@ -12,6 +12,12 @@ public class UIFactory {
         panel.setBackground(new Color(30, 30, 30));
         return panel;
     }
+    public static JPanel createSubPanel(LayoutManager layout)
+    {
+        JPanel panel = new JPanel(layout);
+        panel.setBackground(new Color(30, 30, 30));
+        return panel;
+    }
 
     public static JLabel createTitleLabel(String text, int fontSize) {
 
@@ -125,5 +131,6 @@ public class UIFactory {
         label.setVisible(false);
         return label;
     }
+
 
 }
