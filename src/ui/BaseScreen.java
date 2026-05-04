@@ -43,7 +43,7 @@ public abstract class BaseScreen {
         navBar.add(logoPanel);
 
         navBar.add(createNavItem("DashBoard", activeItem.equals("DashBoard"), () -> app.showDashboardScreen()));
-        navBar.add(createNavItem("Log Expense", activeItem.equals("Log Expense"), () -> app.showExpenseLoggingScreen()));
+        //navBar.add(createNavItem("Log Expense", activeItem.equals("Log Expense"), () -> app.showExpenseLoggingScreen()));
         navBar.add(createNavItem("History", activeItem.equals("History"), () -> app.showHistoryScreen()));
         navBar.add(createNavItem("Settings", activeItem.equals("Settings"), () -> app.showSettingsScreen()));
 
