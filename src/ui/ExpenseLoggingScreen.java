@@ -6,6 +6,8 @@ import java.awt.*;
 import domain.Category;
 import util.UIFactory;
 import util.AppColors;
+
+import java.time.LocalDate;
 import java.util.List;
 
 public class ExpenseLoggingScreen extends BaseScreen {
@@ -16,6 +18,9 @@ public class ExpenseLoggingScreen extends BaseScreen {
     private JLabel errorLabel;
     private JTextField newCategoryField;
     private JButton addCategoryButton;
+    private LocalDate todayDate;
+    private JLabel todayDateLabel;
+    private JTextField todayDateField;
 
     private Category selectedCategory;
 
@@ -58,6 +63,10 @@ public class ExpenseLoggingScreen extends BaseScreen {
                 newCategoryField.setText("");
             }
         });
+        todayDate = LocalDate.now();
+        todayDateLabel = UIFactory.createSubLabel("Transaction date", 13);
+        todayDateField = UIFactory.createTextField(todayDate.toString());
+        todayDateField.setText(todayDate.toString());
 
         loadCategories();
     }
@@ -104,18 +113,30 @@ public class ExpenseLoggingScreen extends BaseScreen {
         card.add(amountField, gbc);
 
         gbc.gridy = 4;
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.weightx = 0;
-        gbc.insets = new Insets(5, 20, 4, 20);
-        card.add(UIFactory.createFieldLabel("Category"), gbc);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
+        gbc.insets = new Insets(0, 20, 10, 20);
+        card.add(todayDateLabel, gbc);
 
         gbc.gridy = 5;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0;
         gbc.insets = new Insets(0, 20, 10, 20);
-        card.add(categoryComboBox, gbc);
+        card.add(todayDateField, gbc);
 
         gbc.gridy = 6;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.weightx = 0;
+        gbc.insets = new Insets(5, 20, 4, 20);
+        card.add(UIFactory.createFieldLabel("Category"), gbc);
+
+        gbc.gridy = 7;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
+        gbc.insets = new Insets(0, 20, 10, 20);
+        card.add(categoryComboBox, gbc);
+
+        gbc.gridy = 8;
         gbc.gridwidth = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 0.7;
