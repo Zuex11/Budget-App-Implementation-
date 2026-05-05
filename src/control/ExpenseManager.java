@@ -65,4 +65,7 @@ public class ExpenseManager {
     public double getTodaySpent(int cycleId) {
         return dbHelper.getTodaySpent(cycleId);
     }
+    public void deleteCategory(int id) {
+        dbHelper.deleteCategory(id);
+    }
 }

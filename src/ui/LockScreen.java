@@ -18,16 +18,23 @@ public class LockScreen extends BaseScreen {
 
     public void onUnlockClicked() {
         String enteredPin = new String(pinField.getPassword());
-
-        if (app.getAuthManager().verifyPIN(enteredPin)) {
-            navigateToDashboard();
-        }
-
-        else if (app.getAuthManager().isLockedOut()) {
+//
+//        if (app.getAuthManager().verifyPIN(enteredPin)) {
+//            navigateToDashboard();
+//        }
+//
+//        else if (app.getAuthManager().isLockedOut()) {
+//            showLockoutMessage((int) app.getAuthManager().getSecondsRemaining());
+//        }
+//
+//        else {
+//            showWrongPinError();
+//        }
+        if (app.getAuthManager().isLockedOut()) {
             showLockoutMessage((int) app.getAuthManager().getSecondsRemaining());
-        }
-
-        else {
+        } else if (app.getAuthManager().verifyPIN(enteredPin)) {
+            navigateToDashboard();
+        } else {
             showWrongPinError();
         }
     }
