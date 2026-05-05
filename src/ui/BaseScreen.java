@@ -50,7 +50,7 @@ public abstract class BaseScreen {
         return navBar;
     }
 
-    private JPanel createNavItem(String text, boolean active, Runnable onClick) {
+    protected JPanel createNavItem(String text, boolean active, Runnable onClick) {
         JPanel wrapper = new JPanel(new BorderLayout());
         wrapper.setMaximumSize(new Dimension(180, 40));
         wrapper.setBackground(active ? new Color(55, 52, 90) : new Color(42, 42, 42));
@@ -69,7 +69,7 @@ public abstract class BaseScreen {
         return wrapper;
     }
 
-    public JButton createNavButton(String text, boolean active) {
+    protected JButton createNavButton(String text, boolean active) {
         JButton btn = new JButton(text);
         btn.setMaximumSize(new Dimension(180, 40));
         btn.setPreferredSize(new Dimension(180, 40));

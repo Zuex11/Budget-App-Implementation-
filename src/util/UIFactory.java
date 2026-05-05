@@ -90,6 +90,18 @@ public class UIFactory {
         btn.setPreferredSize(new Dimension(160, 40));
         return btn;
     }
+    public static JButton createNormalButton(String text) {
+        JButton btn = new JButton(text);
+        btn.setBackground(new Color(30, 30, 30));
+        btn.setForeground(Color.WHITE);
+        btn.setOpaque(true);
+        btn.setBorderPainted(true);
+        btn.setFocusPainted(false);
+        btn.setBorder(BorderFactory.createLineBorder(Color.WHITE, 1, true));
+        btn.setFont(btn.getFont().deriveFont(Font.BOLD, 14f));
+        btn.setPreferredSize(new Dimension(80, 20));
+        return btn;
+    }
 
     public static JButton createSecondaryButton(String text) {
         JButton btn = new JButton(text);
@@ -131,6 +143,7 @@ public class UIFactory {
         label.setVisible(false);
         return label;
     }
+
 
 
 }

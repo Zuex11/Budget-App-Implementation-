@@ -129,6 +129,9 @@ public class App {
     public void editExpense(int id, double amount, int categoryId) {
         expenseManager.editExpense(id, amount, categoryId);
     }
+    public void deleteCategory(int id) {
+        expenseManager.deleteCategory(id);
+    }
 
     public void deleteExpense(int id) {
         expenseManager.deleteExpense(id);

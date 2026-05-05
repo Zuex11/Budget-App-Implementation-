@@ -419,4 +419,14 @@ public class DatabaseHelper
         } catch (SQLException e) { e.printStackTrace(); }
         return 0;
     }
+    public void deleteCategory(int id) {
+        String DELETE_CATEGORY = "DELETE FROM category WHERE id = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(DELETE_CATEGORY);
+            statement.setInt(1, id);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }
