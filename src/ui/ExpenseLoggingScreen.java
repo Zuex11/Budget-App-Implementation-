@@ -10,39 +10,75 @@ import util.AppColors;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Screen that allows the user to log a new expense.
+ *
+ * <p>Collects an amount in EGP and a category selection, validates the inputs,
+ * then delegates to {@link App#logExpense} before returning to the dashboard.</p>
+ */
 public class ExpenseLoggingScreen extends BaseScreen {
+
+    /** Input field for the expense amount in EGP. */
     private JTextField amountField;
+
+    /** Drop-down for selecting the expense category. */
     private JComboBox<Category> categoryComboBox;
+
+    /** Button that submits the expense. */
     private JButton saveButton;
+
+    /** Button that cancels and returns to the dashboard. */
     private JButton cancelButton;
+
+    /** Label used to surface validation error messages. */
     private JLabel errorLabel;
+
+    /** Today's date, used to pre-fill the transaction date field. */
     private LocalDate todayDate;
+
+    /** Label for the transaction date field. */
     private JLabel todayDateLabel;
+
+    /** Read-only field showing today's date as the transaction date. */
     private JTextField todayDateField;
+
+    /** Currently selected category, kept in sync with the combo box. */
     private Category selectedCategory;
 
-    public ExpenseLoggingScreen(App app) { super(app); }
+    /**
+     * Constructs the ExpenseLoggingScreen.
+     *
+     * @param app the central application controller
+     */
+    public ExpenseLoggingScreen(App app) {
+        super(app);
+    }
 
+    /**
+     * Populates the category combo box with all categories from the database
+     * and syncs {@link #selectedCategory} to the first item.
+     */
     private void loadCategories() {
         categoryComboBox.removeAllItems();
         for (Category c : app.getCategories()) categoryComboBox.addItem(c);
         selectedCategory = (Category) categoryComboBox.getSelectedItem();
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void initComponents() {
         categoryComboBox = new JComboBox<>();
         categoryComboBox.addActionListener(e -> selectedCategory = (Category) categoryComboBox.getSelectedItem());
 
-        amountField = UIFactory.createTextField("e.g. 50.00");
-        saveButton = UIFactory.createPrimaryButton("Save");
+        amountField  = UIFactory.createTextField("e.g. 50.00");
+        saveButton   = UIFactory.createPrimaryButton("Save");
         cancelButton = UIFactory.createSecondaryButton("Cancel");
-        errorLabel = UIFactory.createErrorLabel();
+        errorLabel   = UIFactory.createErrorLabel();
 
         saveButton.addActionListener(e -> onSaveClicked());
         cancelButton.addActionListener(e -> app.showDashboardScreen());
 
-        todayDate = LocalDate.now();
+        todayDate      = LocalDate.now();
         todayDateLabel = UIFactory.createSubLabel("Transaction date", 13);
         todayDateField = UIFactory.createTextField(todayDate.toString());
         todayDateField.setText(todayDate.toString());
@@ -50,6 +86,7 @@ public class ExpenseLoggingScreen extends BaseScreen {
         loadCategories();
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void initLayout() {
         panel = new JPanel(new BorderLayout());
@@ -77,11 +114,8 @@ public class ExpenseLoggingScreen extends BaseScreen {
         gbc.insets = new Insets(0, 20, 10, 20);
         card.add(amountField, gbc);
 
-        gbc.gridy = 4;
-        card.add(todayDateLabel, gbc);
-
-        gbc.gridy = 5;
-        card.add(todayDateField, gbc);
+        gbc.gridy = 4; card.add(todayDateLabel, gbc);
+        gbc.gridy = 5; card.add(todayDateField, gbc);
 
         gbc.gridy = 6; gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0;
         gbc.insets = new Insets(5, 20, 4, 20);
@@ -108,6 +142,12 @@ public class ExpenseLoggingScreen extends BaseScreen {
         panel.add(centerPanel, BorderLayout.CENTER);
     }
 
+    /**
+     * Validates all form inputs before saving.
+     * Shows an inline error and returns {@code false} on the first failure.
+     *
+     * @return {@code true} if amount is a positive number and a category is selected
+     */
     public boolean validateInputs() {
         String amountText = amountField.getText().trim();
         if (amountText.isEmpty()) { showError("Amount is required."); return false; }
@@ -120,15 +160,37 @@ public class ExpenseLoggingScreen extends BaseScreen {
         return true;
     }
 
+    /**
+     * Shows a validation error message below the form.
+     *
+     * @param message the error text to display
+     */
     public void showError(String message) {
         errorLabel.setText(message);
         errorLabel.setVisible(true);
     }
 
-    public void onCategorySelected(Category category) { selectedCategory = category; }
+    /**
+     * Updates the selected category when the combo box selection changes.
+     *
+     * @param category the newly selected {@link Category}
+     */
+    public void onCategorySelected(Category category) {
+        selectedCategory = category;
+    }
 
-    public void showSuccessAndReturn() { app.showDashboardScreen(); }
+    /**
+     * Navigates back to the dashboard after a successful save.
+     */
+    public void showSuccessAndReturn() {
+        app.showDashboardScreen();
+    }
 
+    /**
+     * Handles the "Save" button click.
+     * Validates inputs, logs the expense, recalculates the daily limit,
+     * and returns to the dashboard.
+     */
     public void onSaveClicked() {
         if (validateInputs()) {
             double amount = Double.parseDouble(amountField.getText().trim());

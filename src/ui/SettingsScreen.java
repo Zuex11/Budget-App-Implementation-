@@ -7,34 +7,67 @@ import util.UIFactory;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Settings screen with three sub-sections: Categories, Security, and Cycle.
+ *
+ * <p>A secondary vertical nav bar on the left switches between the sections
+ * using a {@link CardLayout}.</p>
+ */
 public class SettingsScreen extends BaseScreen {
+
+    /** Button to reset (delete) the current budget cycle. */
     private JButton resetCycleButton;
+
+    /** Checkbox to enable or disable PIN lock. */
     private JCheckBox enablePinCheckBox;
+
+    /** Button to change the existing PIN. */
     private JButton changePinButton;
+
+    /** Panel that hosts the three settings sub-panels via CardLayout. */
     private JPanel contentPanel;
+
+    /** Layout manager for switching between settings sub-panels. */
     private CardLayout cardLayout;
-    private JButton categoriesBtn, securityBtn, cycleBtn;
 
-    public SettingsScreen(App app) { super(app); }
+    /** Sub-nav button for the Categories panel. */
+    private JButton categoriesBtn;
 
+    /** Sub-nav button for the Security panel. */
+    private JButton securityBtn;
+
+    /** Sub-nav button for the Cycle panel. */
+    private JButton cycleBtn;
+
+    /**
+     * Constructs the SettingsScreen.
+     *
+     * @param app the central application controller
+     */
+    public SettingsScreen(App app) {
+        super(app);
+    }
+
+    /** {@inheritDoc} */
     @Override
     protected void initComponents() {
-        resetCycleButton = UIFactory.createNormalButton("Reset");
-        changePinButton = UIFactory.createNormalButton("Change PIN");
+        resetCycleButton  = UIFactory.createNormalButton("Reset");
+        changePinButton   = UIFactory.createNormalButton("Change PIN");
         enablePinCheckBox = new JCheckBox();
         enablePinCheckBox.setBackground(AppColors.CARD);
 
-        cardLayout = new CardLayout();
-        contentPanel = UIFactory.createSubPanel(cardLayout);
+        cardLayout    = new CardLayout();
+        contentPanel  = UIFactory.createSubPanel(cardLayout);
         contentPanel.add(buildCategoriesPanel(), "Categories");
-        contentPanel.add(buildSecurityPanel(), "Security");
-        contentPanel.add(buildCyclePanel(), "Cycle");
+        contentPanel.add(buildSecurityPanel(),   "Security");
+        contentPanel.add(buildCyclePanel(),      "Cycle");
 
         resetCycleButton.addActionListener(e -> onResetCycleClicked());
         changePinButton.addActionListener(e -> onChangePinClicked());
         enablePinCheckBox.addActionListener(e -> onEnablePinToggled(enablePinCheckBox.isSelected()));
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void initLayout() {
         panel = UIFactory.createMainPanel(new BorderLayout());
@@ -53,13 +86,19 @@ public class SettingsScreen extends BaseScreen {
         centerPanel.add(createSubNavBar("Categories"), BorderLayout.WEST);
         centerPanel.add(contentPanel, BorderLayout.CENTER);
 
-        mainContent.add(titlePanel, BorderLayout.NORTH);
-        mainContent.add(centerPanel, BorderLayout.CENTER);
+        mainContent.add(titlePanel,   BorderLayout.NORTH);
+        mainContent.add(centerPanel,  BorderLayout.CENTER);
 
         panel.add(createNavBar("Settings"), BorderLayout.WEST);
-        panel.add(mainContent, BorderLayout.CENTER);
+        panel.add(mainContent,              BorderLayout.CENTER);
     }
 
+    /**
+     * Builds the secondary vertical nav bar for switching between settings sections.
+     *
+     * @param activeItem name of the initially active section
+     * @return the assembled sub-nav panel
+     */
     public JPanel createSubNavBar(String activeItem) {
         JPanel navBar = new JPanel();
         navBar.setLayout(new BoxLayout(navBar, BoxLayout.Y_AXIS));
@@ -85,12 +124,17 @@ public class SettingsScreen extends BaseScreen {
         }
 
         setActiveSubNav(activeItem.equals("Security") ? securityBtn :
-                activeItem.equals("Cycle")    ? cycleBtn    : categoriesBtn);
-
+                        activeItem.equals("Cycle")    ? cycleBtn    : categoriesBtn);
         navBar.add(Box.createVerticalGlue());
         return navBar;
     }
 
+    /**
+     * Creates a styled secondary nav button.
+     *
+     * @param text button label
+     * @return the configured {@link JButton}
+     */
     private JButton buildSubNavBtn(String text) {
         JButton btn = new JButton(text);
         btn.setHorizontalAlignment(SwingConstants.LEFT);
@@ -104,32 +148,51 @@ public class SettingsScreen extends BaseScreen {
         return btn;
     }
 
+    /**
+     * Highlights the active sub-nav button and resets the others.
+     *
+     * @param active the button to mark as active
+     */
     private void setActiveSubNav(JButton active) {
         for (JButton btn : new JButton[]{categoriesBtn, securityBtn, cycleBtn}) {
             boolean isActive = btn == active;
             btn.setForeground(isActive ? new Color(127, 119, 221) : new Color(136, 136, 136));
-            btn.setBackground(isActive ? new Color(55, 52, 90) : new Color(42, 42, 42));
+            btn.setBackground(isActive ? new Color(55, 52, 90)    : new Color(42, 42, 42));
             if (btn.getParent() != null)
                 btn.getParent().setBackground(btn.getBackground());
         }
     }
 
+    /**
+     * Builds a single settings row with a title, subtitle, and an action component.
+     *
+     * @param title    primary label text
+     * @param subtitle secondary description text
+     * @param action   the interactive component (button, checkbox, etc.)
+     * @return the assembled settings row panel
+     */
     private JPanel buildSettingsRow(String title, String subtitle, JComponent action) {
         JPanel row = new JPanel(new BorderLayout());
         row.setBackground(AppColors.CARD);
         row.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(58, 58, 58)),
-                BorderFactory.createEmptyBorder(12, 16, 12, 16)
+            BorderFactory.createLineBorder(new Color(58, 58, 58)),
+            BorderFactory.createEmptyBorder(12, 16, 12, 16)
         ));
         JPanel textPanel = new JPanel(new GridLayout(2, 1));
         textPanel.setBackground(AppColors.CARD);
         textPanel.add(UIFactory.createTitleLabel(title, 13));
         textPanel.add(UIFactory.createSubLabel(subtitle, 12));
         row.add(textPanel, BorderLayout.CENTER);
-        row.add(action, BorderLayout.EAST);
+        row.add(action,    BorderLayout.EAST);
         return row;
     }
 
+    /**
+     * Builds the Categories sub-panel with a list of existing categories
+     * and controls to add or delete them.
+     *
+     * @return the categories panel
+     */
     private JPanel buildCategoriesPanel() {
         JPanel p = UIFactory.createMainPanel(new BorderLayout());
 
@@ -148,7 +211,7 @@ public class SettingsScreen extends BaseScreen {
         scroll.getViewport().setBackground(AppColors.CARD);
 
         JTextField newCatField = UIFactory.createTextField("New category name");
-        JButton addBtn = UIFactory.createNormalButton("Add");
+        JButton addBtn    = UIFactory.createNormalButton("Add");
         JButton deleteBtn = UIFactory.createNormalButton("Delete");
 
         addBtn.addActionListener(e -> {
@@ -165,9 +228,9 @@ public class SettingsScreen extends BaseScreen {
             if (idx != -1) {
                 String name = listModel.getElementAt(idx);
                 app.getCategories().stream()
-                        .filter(c -> c.getName().equals(name))
-                        .findFirst()
-                        .ifPresent(c -> app.deleteCategory(c.getId()));
+                    .filter(c -> c.getName().equals(name))
+                    .findFirst()
+                    .ifPresent(c -> app.deleteCategory(c.getId()));
                 listModel.remove(idx);
             }
         });
@@ -178,13 +241,18 @@ public class SettingsScreen extends BaseScreen {
         btnPanel.add(deleteBtn);
         btnPanel.add(addBtn);
         bottomBar.add(newCatField, BorderLayout.CENTER);
-        bottomBar.add(btnPanel, BorderLayout.EAST);
+        bottomBar.add(btnPanel,    BorderLayout.EAST);
 
-        p.add(scroll, BorderLayout.CENTER);
+        p.add(scroll,    BorderLayout.CENTER);
         p.add(bottomBar, BorderLayout.SOUTH);
         return p;
     }
 
+    /**
+     * Builds the Security sub-panel with PIN enable toggle and change PIN row.
+     *
+     * @return the security panel
+     */
     private JPanel buildSecurityPanel() {
         JPanel p = UIFactory.createMainPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -207,6 +275,11 @@ public class SettingsScreen extends BaseScreen {
         return p;
     }
 
+    /**
+     * Builds the Cycle sub-panel with a reset cycle button.
+     *
+     * @return the cycle panel
+     */
     private JPanel buildCyclePanel() {
         JPanel p = UIFactory.createMainPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -218,16 +291,26 @@ public class SettingsScreen extends BaseScreen {
         return p;
     }
 
+    /**
+     * Handles the "Reset" button click in the Cycle panel.
+     * Asks for confirmation, resets the cycle, and navigates to the setup screen.
+     */
     public void onResetCycleClicked() {
         int confirm = JOptionPane.showConfirmDialog(panel,
-                "This will permanently delete all logs. Continue?",
-                "Reset Cycle", JOptionPane.YES_NO_OPTION);
+            "This will permanently delete all logs. Continue?",
+            "Reset Cycle", JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
             app.resetCycle();
             app.showSetupScreen();
         }
     }
 
+    /**
+     * Handles the PIN enable/disable toggle.
+     * Prompts the user to set a PIN when enabling; clears the PIN when disabling.
+     *
+     * @param isEnabled {@code true} if the checkbox was just checked
+     */
     public void onEnablePinToggled(boolean isEnabled) {
         if (isEnabled) {
             String pin = JOptionPane.showInputDialog(panel, "Set a 4-digit PIN:");
@@ -245,6 +328,10 @@ public class SettingsScreen extends BaseScreen {
         }
     }
 
+    /**
+     * Handles the "Change PIN" button click.
+     * Prompts for a new 4-digit PIN and updates it if valid.
+     */
     public void onChangePinClicked() {
         String pin = JOptionPane.showInputDialog(panel, "Enter new 4-digit PIN:");
         if (pin != null && pin.matches("\\d{4}")) {

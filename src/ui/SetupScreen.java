@@ -2,27 +2,66 @@ package ui;
 
 import javax.swing.*;
 import app.App;
-import control.CycleManager;
 import util.AppColors;
 import util.UIFactory;
 
 import java.awt.*;
 import java.time.LocalDate;
 
-public class SetupScreen extends BaseScreen{
+/**
+ * First-run screen where the user defines their budget cycle.
+ *
+ * <p>Collects a total allowance and a start/end date range, validates the
+ * inputs, then delegates to {@link App#initializeCycle} before navigating
+ * to the dashboard.</p>
+ */
+public class SetupScreen extends BaseScreen {
+
+    /** Input field for the total budget allowance in EGP. */
     private JTextField allowanceField;
-    private JSpinner startDay, startMonth, startYear;
-    private JSpinner endDay, endMonth, endYear;
+
+    /** Day spinner for the cycle start date. */
+    private JSpinner startDay;
+
+    /** Month spinner for the cycle start date. */
+    private JSpinner startMonth;
+
+    /** Year spinner for the cycle start date. */
+    private JSpinner startYear;
+
+    /** Day spinner for the cycle end date. */
+    private JSpinner endDay;
+
+    /** Month spinner for the cycle end date. */
+    private JSpinner endMonth;
+
+    /** Year spinner for the cycle end date. */
+    private JSpinner endYear;
+
+    /** Button that submits the form and creates the cycle. */
     private JButton startCycleButton;
+
+    /** Button that exits the application (no cycle = no app). */
     private JButton cancelButton;
+
+    /** Label used to surface validation error messages. */
     private JLabel errorLabel;
-    private final int  titleFontSize = 25;
+
+    /** Font size for the screen title label. */
+    private final int titleFontSize = 25;
+    /** Font size for the screen subtitle label. */
     private final int subTitleFontSize = 18;
 
+    /**
+     * Constructs the SetupScreen.
+     *
+     * @param app the central application controller
+     */
     public SetupScreen(App app) {
         super(app);
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void initComponents() {
         allowanceField = UIFactory.createTextField("e.g. 5,000.00");
@@ -42,41 +81,32 @@ public class SetupScreen extends BaseScreen{
         cancelButton.addActionListener(e -> System.exit(0));
     }
 
+    /** {@inheritDoc} */
     @Override
-    protected void initLayout(){
+    protected void initLayout() {
         panel = new JPanel(new GridBagLayout());
         panel.setBackground(AppColors.BACKGROUND);
 
         JPanel card = UIFactory.createCard(520, 460);
-
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.anchor = GridBagConstraints.WEST;
-        
 
-
-        // Title
         gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
         gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0;
         gbc.insets = new Insets(25, 20, 0, 20);
         card.add(UIFactory.createTitleLabel("Set up your budget cycle", titleFontSize), gbc);
 
-        // Description
-        gbc.gridy = 1;
-        gbc.insets = new Insets(4, 20, 10, 20);
-        card.add(UIFactory.createSubLabel("Define your allowance and the period you want to track spending for.", subTitleFontSize), gbc);
+        gbc.gridy = 1; gbc.insets = new Insets(4, 20, 10, 20);
+        card.add(UIFactory.createSubLabel(
+            "Define your allowance and the period you want to track spending for.", subTitleFontSize), gbc);
 
-        // Allowance label
-        gbc.gridy = 2;
-        gbc.insets = new Insets(5, 20, 4, 20);
+        gbc.gridy = 2; gbc.insets = new Insets(5, 20, 4, 20);
         card.add(UIFactory.createFieldLabel("Total allowance (EGP)"), gbc);
 
-        // Allowance field
-        gbc.gridy = 3;
-        gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
+        gbc.gridy = 3; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
         gbc.insets = new Insets(0, 20, 10, 20);
         card.add(allowanceField, gbc);
 
-        // Date labels
         gbc.gridy = 4; gbc.gridwidth = 1;
         gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0;
         gbc.gridx = 0; gbc.insets = new Insets(5, 20, 4, 10);
@@ -85,43 +115,42 @@ public class SetupScreen extends BaseScreen{
         gbc.gridx = 1; gbc.insets = new Insets(5, 10, 4, 20);
         card.add(UIFactory.createFieldLabel("Cycle end date"), gbc);
 
-        // Start date spinners
         GridBagConstraints startGbc = new GridBagConstraints();
         startGbc.gridx = 0; startGbc.gridy = 5; startGbc.gridwidth = 1;
         startGbc.fill = GridBagConstraints.HORIZONTAL; startGbc.weightx = 1.0;
         startGbc.insets = new Insets(0, 20, 10, 10);
         card.add(buildDatePanel(startDay, startMonth, startYear), startGbc);
 
-        // End date spinners
         GridBagConstraints endGbc = new GridBagConstraints();
         endGbc.gridx = 1; endGbc.gridy = 5; endGbc.gridwidth = 1;
         endGbc.fill = GridBagConstraints.HORIZONTAL; endGbc.weightx = 1.0;
         endGbc.insets = new Insets(0, 10, 10, 20);
         card.add(buildDatePanel(endDay, endMonth, endYear), endGbc);
 
-        // Error label
         gbc.gridx = 0; gbc.gridy = 6; gbc.gridwidth = 2;
         gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0;
         gbc.insets = new Insets(0, 20, 5, 20);
         card.add(errorLabel, gbc);
 
-        // Cancel button
-        gbc.gridy = 7;
-        gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
+        gbc.gridy = 7; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
         gbc.insets = new Insets(5, 20, 5, 20);
         card.add(cancelButton, gbc);
 
-        // Start cycle button
-        gbc.gridy = 8;
-        gbc.insets = new Insets(0, 20, 25, 20);
+        gbc.gridy = 8; gbc.insets = new Insets(0, 20, 25, 20);
         card.add(startCycleButton, gbc);
 
-        // Add card centered in panel
-        GridBagConstraints cardGbc = new GridBagConstraints();
-        cardGbc.anchor = GridBagConstraints.CENTER;
-        panel.add(card, cardGbc);
+        panel.add(card, new GridBagConstraints());
     }
 
+    /**
+     * Builds a compact inline date panel with day / month / year spinners
+     * separated by slash labels.
+     *
+     * @param day   spinner for the day component (1–31)
+     * @param month spinner for the month component (1–12)
+     * @param year  spinner for the year component
+     * @return the assembled date panel
+     */
     private JPanel buildDatePanel(JSpinner day, JSpinner month, JSpinner year) {
         JPanel inner = new JPanel(new GridBagLayout());
         inner.setBackground(AppColors.FIELD);
@@ -144,38 +173,49 @@ public class SetupScreen extends BaseScreen{
         return inner;
     }
 
+    /**
+     * Handles the "Start cycle" button click.
+     * Validates inputs and, if valid, creates the cycle and navigates to the dashboard.
+     */
     public void onStartCycleClicked() {
-        if(validateInputs())
-        {
+        if (validateInputs()) {
             double allowance = Double.parseDouble(allowanceField.getText().replaceAll(",", ""));
             LocalDate startDate = LocalDate.of(
-                    (int) startYear.getValue(),
-                    (int) startMonth.getValue(),
-                    (int) startDay.getValue()
+                (int) startYear.getValue(),
+                (int) startMonth.getValue(),
+                (int) startDay.getValue()
             );
             LocalDate endDate = LocalDate.of(
-                    (int) endYear.getValue(),
-                    (int) endMonth.getValue(),
-                    (int) endDay.getValue()
+                (int) endYear.getValue(),
+                (int) endMonth.getValue(),
+                (int) endDay.getValue()
             );
             app.initializeCycle(allowance, startDate, endDate);
             app.showDashboardScreen();
         }
     }
 
+    /**
+     * Validates all user inputs before cycle creation.
+     * Displays an appropriate error message and returns {@code false} if any
+     * check fails.
+     *
+     * @return {@code true} if all inputs are valid, {@code false} otherwise
+     */
     public boolean validateInputs() {
         String allowance = allowanceField.getText().trim();
         LocalDate todayDate = LocalDate.now();
         LocalDate startDate = LocalDate.of(
-                (int) startYear.getValue(),
-                (int) startMonth.getValue(),
-                (int) startDay.getValue()
+            (int) startYear.getValue(),
+            (int) startMonth.getValue(),
+            (int) startDay.getValue()
         );
         LocalDate endDate = LocalDate.of(
-                (int) endYear.getValue(),
-                (int) endMonth.getValue(),
-                (int) endDay.getValue()
+            (int) endYear.getValue(),
+            (int) endMonth.getValue(),
+            (int) endDay.getValue()
         );
+
         if (allowance.isEmpty()) {
             showError("Please fill all the fields!");
             return false;
@@ -190,13 +230,11 @@ public class SetupScreen extends BaseScreen{
             showError("Allowance must be a valid number.");
             return false;
         }
-        if(startDate.isBefore(todayDate))
-        {
+        if (startDate.isBefore(todayDate)) {
             showError("Start date must be after today.");
             return false;
         }
-        if(endDate.isBefore(startDate))
-        {
+        if (endDate.isBefore(startDate)) {
             showError("End date must be after start date.");
             return false;
         }
@@ -205,11 +243,19 @@ public class SetupScreen extends BaseScreen{
         return true;
     }
 
+    /**
+     * Displays a validation error message below the form.
+     *
+     * @param message the error text to show
+     */
     public void showError(String message) {
         errorLabel.setText(message);
         errorLabel.setVisible(true);
     }
 
+    /**
+     * Navigates to the dashboard screen.
+     */
     public void navigateToDashboard() {
         app.showDashboardScreen();
     }

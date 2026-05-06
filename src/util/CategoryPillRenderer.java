@@ -1,31 +1,76 @@
 package util;
 
-import app.App;
 import domain.Category;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Table cell renderer that draws category names as rounded pill badges,
+ * with a consistent colour assigned to each category by index.
+ *
+ * <p>The pill is painted using a custom {@link JPanel#paintComponent} override
+ * that draws a rounded rectangle. Text is centred inside with horizontal padding.</p>
+ */
 public class CategoryPillRenderer extends DefaultTableCellRenderer {
+
+    /** Ordered list of categories, used to assign consistent colours by index. */
     private final List<Category> categories;
+
+    /** Background colours cycled by category index. */
+    private static final List<Color> BG_COLORS = Arrays.asList(
+        new Color(58, 90, 30),
+        new Color(25, 70, 120),
+        new Color(100, 40, 30),
+        new Color(60, 50, 100),
+        new Color(58, 58, 58)
+    );
+
+    /** Foreground (text) colours cycled by category index. */
+    private static final List<Color> FG_COLORS = Arrays.asList(
+        new Color(150, 220, 80),
+        new Color(80, 170, 255),
+        new Color(255, 130, 100),
+        new Color(175, 169, 236),
+        Color.WHITE
+    );
+
+    /**
+     * Constructs a CategoryPillRenderer with the full category list.
+     *
+     * @param categories all categories in the system, used for colour assignment
+     */
     public CategoryPillRenderer(List<Category> categories) {
         this.categories = categories;
     }
 
+    /**
+     * Returns a centred pill badge component for the given category name.
+     * The pill background and text colour are derived from the category's
+     * position in the {@link #categories} list.
+     *
+     * @param table      the table being rendered
+     * @param value      the cell value (expected to be a category name string)
+     * @param isSelected {@code true} if the row is currently selected
+     * @param hasFocus   {@code true} if the cell has keyboard focus
+     * @param row        the row index
+     * @param column     the column index
+     * @return a wrapper panel containing the rendered pill
+     */
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value,
-                                                   boolean isSelected, boolean hasFocus, int row, int column) {
+            boolean isSelected, boolean hasFocus, int row, int column) {
+
         JPanel wrapper = new JPanel(new GridBagLayout());
         wrapper.setBackground(isSelected ? new Color(83, 74, 183) : new Color(42, 42, 42));
 
         String categoryName = value.toString();
 
-        // find matching category index for consistent color
+        // Find the category index for consistent colour assignment
         int index = 0;
         for (int i = 0; i < categories.size(); i++) {
             if (categories.get(i).getName().equalsIgnoreCase(categoryName)) {
@@ -34,23 +79,8 @@ public class CategoryPillRenderer extends DefaultTableCellRenderer {
             }
         }
 
-        List<Color> bgColors = Arrays.asList(
-                new Color(58, 90, 30),
-                new Color(25, 70, 120),
-                new Color(100, 40, 30),
-                new Color(60, 50, 100),
-                new Color(58, 58, 58)
-        );
-        List<Color> fgColors = Arrays.asList(
-                new Color(150, 220, 80),
-                new Color(80, 170, 255),
-                new Color(255, 130, 100),
-                new Color(175, 169, 236),
-                Color.WHITE
-        );
-
-        Color bg = bgColors.get(index % bgColors.size());
-        Color fg = fgColors.get(index % fgColors.size());
+        Color bg = BG_COLORS.get(index % BG_COLORS.size());
+        Color fg = FG_COLORS.get(index % FG_COLORS.size());
 
         JPanel pill = new JPanel() {
             @Override
@@ -73,33 +103,5 @@ public class CategoryPillRenderer extends DefaultTableCellRenderer {
         wrapper.add(pill);
 
         return wrapper;
-    }
-    private Color pickBgCategoryColor()
-    {
-        Color bgColor;
-        List<Color> bgColors = Arrays.asList(
-                new Color(58, 90, 30),
-                new Color(25, 70, 120),
-                new Color(100, 40, 30),
-                new Color(60, 50, 100),
-                new Color(58, 58, 58)
-        );
-
-        Random random = new Random();
-        bgColor = bgColors.get(random.nextInt(bgColors.size()));
-        return bgColor;
-    }
-    private Color fgColor()
-    {
-        Color fgColor;
-        List<Color> fgColors = Arrays.asList(
-                new Color(150, 220, 80),
-                new Color(80, 170, 255),
-                new Color(255, 130, 100),
-                new Color(175, 169, 236)
-        );
-        Random random = new Random();
-        fgColor = fgColors.get(random.nextInt(fgColors.size()));
-        return fgColor;
     }
 }

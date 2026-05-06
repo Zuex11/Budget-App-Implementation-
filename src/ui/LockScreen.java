@@ -6,30 +6,43 @@ import java.awt.*;
 import util.UIFactory;
 import util.AppColors;
 
+/**
+ * Screen shown at startup when a PIN has been set.
+ *
+ * <p>The user must enter the correct PIN to reach the dashboard. After
+ * {@code AuthManager.MAX_ATTEMPTS} consecutive failures the screen shows a
+ * countdown timer and blocks further attempts until the lockout expires.</p>
+ */
 public class LockScreen extends BaseScreen {
+
+    /** Field where the user types their PIN (masked). */
     private JPasswordField pinField;
+
+    /** Button that submits the entered PIN for verification. */
     private JButton unlockButton;
+
+    /** Label shown when an incorrect PIN is entered. */
     private JLabel failedAttemptLabel;
+
+    /** Label showing the remaining lockout time in seconds. */
     private JLabel lockOutTimerLabel;
 
+    /**
+     * Constructs the LockScreen.
+     *
+     * @param app the central application controller
+     */
     public LockScreen(App app) {
         super(app);
     }
 
+    /**
+     * Handles the unlock button click.
+     * Checks lockout status first, then verifies the entered PIN.
+     * Navigates to the dashboard on success, or shows an appropriate error.
+     */
     public void onUnlockClicked() {
         String enteredPin = new String(pinField.getPassword());
-//
-//        if (app.getAuthManager().verifyPIN(enteredPin)) {
-//            navigateToDashboard();
-//        }
-//
-//        else if (app.getAuthManager().isLockedOut()) {
-//            showLockoutMessage((int) app.getAuthManager().getSecondsRemaining());
-//        }
-//
-//        else {
-//            showWrongPinError();
-//        }
         if (app.getAuthManager().isLockedOut()) {
             showLockoutMessage((int) app.getAuthManager().getSecondsRemaining());
         } else if (app.getAuthManager().verifyPIN(enteredPin)) {
@@ -39,20 +52,32 @@ public class LockScreen extends BaseScreen {
         }
     }
 
+    /**
+     * Displays the lockout message with the remaining wait time.
+     *
+     * @param secondsRemaining seconds until the lockout expires
+     */
     public void showLockoutMessage(int secondsRemaining) {
         lockOutTimerLabel.setText("Too many attempts. Try again in " + secondsRemaining + "s.");
         lockOutTimerLabel.setVisible(true);
     }
 
+    /**
+     * Displays the incorrect PIN error message.
+     */
     public void showWrongPinError() {
         failedAttemptLabel.setText("Incorrect PIN. Please try again.");
         failedAttemptLabel.setVisible(true);
     }
 
+    /**
+     * Navigates to the dashboard screen after successful authentication.
+     */
     public void navigateToDashboard() {
         app.showDashboardScreen();
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void initComponents() {
         pinField = new JPasswordField();
@@ -68,6 +93,7 @@ public class LockScreen extends BaseScreen {
         unlockButton.addActionListener(e -> onUnlockClicked());
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void initLayout() {
         panel = new JPanel(new BorderLayout());
@@ -88,9 +114,6 @@ public class LockScreen extends BaseScreen {
         card.add(pinField, gbc);
 
         gbc.gridy++;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(0, 20, 10, 20);
-        gbc.weightx = 1;
         card.add(unlockButton, gbc);
 
         gbc.gridy++;

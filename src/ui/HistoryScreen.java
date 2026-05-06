@@ -19,30 +19,61 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Screen that displays the full expense history for the current cycle.
+ *
+ * <p>Features a sortable table, category filter toggle buttons, and
+ * inline edit/delete actions on selected rows.</p>
+ */
 public class HistoryScreen extends BaseScreen {
 
+    /** Table showing all expense transactions. */
     JTable transactionTable;
+
+    /** Backing model for the transaction table. */
     DefaultTableModel transactionTableModel;
+
+    /** Title label at the top of the screen. */
     JLabel titleLabel;
+
+    /** Subtitle showing the current month and year. */
     JLabel subTitleLabel;
+
+    /** Panel holding the category filter toggle buttons. */
     JPanel filterPanel;
+
+    /** All category filter toggle buttons including "All" and "None". */
     List<JToggleButton> filterButtons;
+
+    /** Button to edit the selected expense row. */
     private JButton editButton;
+
+    /** Button to delete the selected expense row. */
     private JButton deleteButton;
+
+    /** In-memory list of expenses currently loaded into the table. */
     private List<Expense> loadedExpenses;
 
+    /** Font size for the screen title label. */
     private final int titleFontSize = 25;
+    /** Font size for the screen subtitle label. */
     private final int subTitleFontSize = 18;
 
+    /**
+     * Constructs the HistoryScreen.
+     *
+     * @param app the central application controller
+     */
     public HistoryScreen(App app) {
         super(app);
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void initComponents() {
         titleLabel = UIFactory.createTitleLabel("Expense", titleFontSize);
-        String thisMonthAndYear = LocalDate.now().getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH)
-                + " " + LocalDate.now().getYear();
+        String thisMonthAndYear = LocalDate.now().getMonth()
+            .getDisplayName(TextStyle.FULL, Locale.ENGLISH) + " " + LocalDate.now().getYear();
         subTitleLabel = UIFactory.createSubLabel("All transactions for " + thisMonthAndYear, subTitleFontSize);
 
         transactionTableModel = initTransactionTableModel();
@@ -51,9 +82,9 @@ public class HistoryScreen extends BaseScreen {
         transactionTable.setRowSorter(sorter);
 
         filterButtons = new ArrayList<>();
-        filterPanel = UIFactory.createSubPanel(new FlowLayout(FlowLayout.LEFT, 6, 6));
+        filterPanel   = UIFactory.createSubPanel(new FlowLayout(FlowLayout.LEFT, 6, 6));
 
-        editButton = UIFactory.createSecondaryButton("Edit");
+        editButton   = UIFactory.createSecondaryButton("Edit");
         deleteButton = UIFactory.createSecondaryButton("Delete");
         deleteButton.setForeground(new Color(220, 80, 80));
 
@@ -65,6 +96,7 @@ public class HistoryScreen extends BaseScreen {
         loadTransactions();
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void initLayout() {
         panel = UIFactory.createMainPanel(new BorderLayout());
@@ -77,28 +109,22 @@ public class HistoryScreen extends BaseScreen {
         gbc.insets = new Insets(12, 12, 0, 0);
         mainContent.add(titleLabel, gbc);
 
-        gbc.gridy = 1;
-        gbc.insets = new Insets(4, 12, 0, 0);
+        gbc.gridy = 1; gbc.insets = new Insets(4, 12, 0, 0);
         mainContent.add(subTitleLabel, gbc);
 
-        gbc.gridy = 2;
-        gbc.insets = new Insets(8, 8, 0, 8);
+        gbc.gridy = 2; gbc.insets = new Insets(8, 8, 0, 8);
         gbc.fill = GridBagConstraints.HORIZONTAL;
         mainContent.add(filterPanel, gbc);
 
-        // Action buttons row
         JPanel actionPanel = UIFactory.createMainPanel(new FlowLayout(FlowLayout.RIGHT, 8, 4));
         editButton.setPreferredSize(new Dimension(80, 32));
         deleteButton.setPreferredSize(new Dimension(80, 32));
         actionPanel.add(editButton);
         actionPanel.add(deleteButton);
-        gbc.gridy = 3;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(0, 8, 0, 8);
+        gbc.gridy = 3; gbc.insets = new Insets(0, 8, 0, 8);
         mainContent.add(actionPanel, gbc);
 
-        gbc.gridy = 4;
-        gbc.weighty = 1.0;
+        gbc.gridy = 4; gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.insets = new Insets(4, 12, 12, 12);
         mainContent.add(styleTransactionTable(transactionTable), gbc);
@@ -107,6 +133,12 @@ public class HistoryScreen extends BaseScreen {
         panel.add(createNavBar("History"), BorderLayout.WEST);
     }
 
+    /**
+     * Creates a non-editable table model with columns:
+     * Description, Category, Date, Amount.
+     *
+     * @return the configured {@link DefaultTableModel}
+     */
     private DefaultTableModel initTransactionTableModel() {
         return new DefaultTableModel(new String[]{"Description", "Category", "Date", "Amount"}, 0) {
             @Override
@@ -116,6 +148,13 @@ public class HistoryScreen extends BaseScreen {
         };
     }
 
+    /**
+     * Applies dark-themed cell renderers and styling to the transaction table,
+     * then wraps it in a scroll pane.
+     *
+     * @param table the table to style
+     * @return a styled {@link JScrollPane} containing the table
+     */
     private JScrollPane styleTransactionTable(JTable table) {
         List<Category> categories = app.getCategories();
         table.getColumnModel().getColumn(0).setCellRenderer(new DefaultDarkRenderer());
@@ -142,6 +181,10 @@ public class HistoryScreen extends BaseScreen {
         return scrollPane;
     }
 
+    /**
+     * Clears and reloads the table from the database.
+     * Also refreshes {@link #loadedExpenses} used for row-level operations.
+     */
     public void loadTransactions() {
         transactionTableModel.setRowCount(0);
         loadedExpenses = app.getExpenses();
@@ -149,20 +192,24 @@ public class HistoryScreen extends BaseScreen {
 
         for (Expense expense : loadedExpenses) {
             String categoryName = categories.stream()
-                    .filter(c -> c.getId() == expense.getCategoryId())
-                    .map(Category::getName)
-                    .findFirst()
-                    .orElse("Unknown");
+                .filter(c -> c.getId() == expense.getCategoryId())
+                .map(Category::getName)
+                .findFirst()
+                .orElse("Unknown");
 
             transactionTableModel.addRow(new Object[]{
-                    categoryName,
-                    categoryName,
-                    expense.getTimestamp(),
-                    expense.getAmount() + " EGP"
+                categoryName,
+                categoryName,
+                expense.getTimestamp(),
+                expense.getAmount() + " EGP"
             });
         }
     }
 
+    /**
+     * Builds and registers all category filter toggle buttons.
+     * Clears any previously registered buttons before rebuilding.
+     */
     public void initFilters() {
         filterPanel.removeAll();
         filterButtons.clear();
@@ -209,19 +256,22 @@ public class HistoryScreen extends BaseScreen {
         filterPanel.repaint();
     }
 
+    /**
+     * Applies the active category filter to the table row sorter.
+     * Shows all rows when "All" is selected; hides all rows when "None" is selected;
+     * otherwise filters to the selected category names.
+     */
     public void applyFilter() {
         TableRowSorter<DefaultTableModel> sorter =
-                (TableRowSorter<DefaultTableModel>) transactionTable.getRowSorter();
+            (TableRowSorter<DefaultTableModel>) transactionTable.getRowSorter();
         if (sorter == null) return;
 
         for (JToggleButton b : filterButtons) {
             if (b.isSelected() && b.getText().equals("None")) {
-                sorter.setRowFilter(RowFilter.andFilter(List.of(
-                        RowFilter.regexFilter("^$", 0))));
+                sorter.setRowFilter(RowFilter.andFilter(List.of(RowFilter.regexFilter("^$", 0))));
                 return;
             }
         }
-
         for (JToggleButton b : filterButtons) {
             if (b.isSelected() && b.getText().equals("All")) {
                 sorter.setRowFilter(null);
@@ -230,23 +280,25 @@ public class HistoryScreen extends BaseScreen {
         }
 
         List<String> selected = new ArrayList<>();
-        for (JToggleButton b : filterButtons) {
+        for (JToggleButton b : filterButtons)
             if (b.isSelected() && !b.getText().equals("All") && !b.getText().equals("None"))
                 selected.add(b.getText());
-        }
 
         if (selected.isEmpty()) {
             sorter.setRowFilter(null);
         } else {
             sorter.setRowFilter(RowFilter.orFilter(
-                    selected.stream()
-                            .map(name -> RowFilter.<DefaultTableModel, Integer>regexFilter(
-                                    "^" + java.util.regex.Pattern.quote(name) + "$", 1))
-                            .toList()
+                selected.stream()
+                    .map(name -> RowFilter.<DefaultTableModel, Integer>regexFilter(
+                        "^" + java.util.regex.Pattern.quote(name) + "$", 1))
+                    .toList()
             ));
         }
     }
 
+    /**
+     * Resets all filters to the "All" state.
+     */
     public void clearFilter() {
         for (JToggleButton b : filterButtons) b.setSelected(false);
         for (JToggleButton b : filterButtons) {
@@ -255,6 +307,10 @@ public class HistoryScreen extends BaseScreen {
         applyFilter();
     }
 
+    /**
+     * Handles the "Edit" button click.
+     * Opens a dialog pre-filled with the selected expense's data and saves changes.
+     */
     public void onEditClick() {
         int viewRow = transactionTable.getSelectedRow();
         if (viewRow < 0) { showEmptyState(); return; }
@@ -268,11 +324,10 @@ public class HistoryScreen extends BaseScreen {
         JComboBox<Category> categoryBox = new JComboBox<>();
         List<Category> categories = app.getCategories();
         for (Category c : categories) categoryBox.addItem(c);
-        // pre-select current category
         categories.stream()
-                .filter(c -> c.getId() == expense.getCategoryId())
-                .findFirst()
-                .ifPresent(categoryBox::setSelectedItem);
+            .filter(c -> c.getId() == expense.getCategoryId())
+            .findFirst()
+            .ifPresent(categoryBox::setSelectedItem);
 
         JPanel dialogPanel = new JPanel(new GridLayout(4, 1, 4, 4));
         dialogPanel.add(new JLabel("New amount (EGP):"));
@@ -281,8 +336,7 @@ public class HistoryScreen extends BaseScreen {
         dialogPanel.add(categoryBox);
 
         int result = JOptionPane.showConfirmDialog(panel, dialogPanel,
-                "Edit Expense", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-
+            "Edit Expense", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result != JOptionPane.OK_OPTION) return;
 
         try {
@@ -296,6 +350,10 @@ public class HistoryScreen extends BaseScreen {
         }
     }
 
+    /**
+     * Handles the "Delete" button click.
+     * Shows a confirmation dialog and deletes the selected expense on confirmation.
+     */
     public void onDeleteClick() {
         int viewRow = transactionTable.getSelectedRow();
         if (viewRow < 0) { showEmptyState(); return; }
@@ -304,8 +362,8 @@ public class HistoryScreen extends BaseScreen {
         Expense expense = loadedExpenses.get(modelRow);
 
         int confirm = JOptionPane.showConfirmDialog(panel,
-                "Delete this expense of " + expense.getAmount() + " EGP?",
-                "Confirm Delete", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+            "Delete this expense of " + expense.getAmount() + " EGP?",
+            "Confirm Delete", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 
         if (confirm == JOptionPane.YES_OPTION) {
             app.deleteExpense(expense.getId());
@@ -313,8 +371,11 @@ public class HistoryScreen extends BaseScreen {
         }
     }
 
+    /**
+     * Shows an information dialog prompting the user to select a row first.
+     */
     public void showEmptyState() {
         JOptionPane.showMessageDialog(panel, "Please select a transaction first.",
-                "No Selection", JOptionPane.INFORMATION_MESSAGE);
+            "No Selection", JOptionPane.INFORMATION_MESSAGE);
     }
 }

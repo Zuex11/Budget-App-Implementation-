@@ -17,29 +17,64 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
+/**
+ * Main dashboard screen showing spending summary, daily limit gauge,
+ * and a category breakdown pie chart.
+ *
+ * <p>Layout is split into two halves: the left shows the pie chart and the
+ * right shows the gauge with a "Log expense" button.</p>
+ */
 public class DashboardScreen extends BaseScreen {
+
+    /** Label displaying the calculated daily spending limit. */
     private JLabel dailyLimitLabel;
+
+    /** Label displaying the total amount spent in the current cycle. */
     private JLabel totalSpentLabel;
+
+    /** Label displaying the remaining balance in the current cycle. */
     private JLabel remainingBalanceLabel;
+
+    /** Percentage of allowance spent (0.0–1.0), used to initialise the gauge. */
     private double spentPercentage;
+
+    /** Pie chart showing spending broken down by category. */
     private JFreeChart spendingPieChart;
+
+    /** Button that navigates to the expense logging screen. */
     private JButton logExpenseBtn;
+
+    /** Label displaying the overall budget status text. */
     private JLabel budgetStatusLabel;
-    private int titleFontSize = 25;
-    private int subTitleFontSize = 18;
+
+    /** Font size for the screen title label. */
+    private final int titleFontSize = 25;
+    /** Font size for the screen subtitle label. */
+    private final int subTitleFontSize = 18;
+
+    /** Circular gauge visualising today's spending against the daily limit. */
     private GaugePanel gauge;
+
+    /** Mutable dataset backing the pie chart; updated on every refresh. */
     private DefaultPieDataset budgetPieDataset;
 
+    /**
+     * Constructs the DashboardScreen.
+     *
+     * @param app the central application controller
+     */
     public DashboardScreen(App app) {
         super(app);
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void initComponents() {
-        dailyLimitLabel = UIFactory.createSubLabel("Daily limit:", subTitleFontSize);
-        totalSpentLabel = UIFactory.createSubLabel("Total spent:", subTitleFontSize);
+        dailyLimitLabel      = UIFactory.createSubLabel("Daily limit:", subTitleFontSize);
+        totalSpentLabel      = UIFactory.createSubLabel("Total spent:", subTitleFontSize);
         remainingBalanceLabel = UIFactory.createSubLabel("Remaining balance:", subTitleFontSize);
-        budgetStatusLabel = UIFactory.createSubLabel("Budget status:", subTitleFontSize);
+        budgetStatusLabel    = UIFactory.createSubLabel("Budget status:", subTitleFontSize);
+
         logExpenseBtn = UIFactory.createPrimaryButton("Log expense");
         logExpenseBtn.addActionListener(e -> onLogExpenseClicked());
 
@@ -47,13 +82,13 @@ public class DashboardScreen extends BaseScreen {
         spentPercentage = (cycle != null) ? cycle.getSpentPercentage() / 100.0 : 0;
         gauge = new GaugePanel(spentPercentage, "0", "EGP");
 
-        // Initialize dataset and chart BEFORE loadDashboardData
         budgetPieDataset = new DefaultPieDataset();
         spendingPieChart = ChartFactory.createPieChart(null, budgetPieDataset, true, false, false);
 
         loadDashboardData();
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void initLayout() {
         panel = UIFactory.createMainPanel(new BorderLayout());
@@ -78,8 +113,7 @@ public class DashboardScreen extends BaseScreen {
         gbc.insets = new Insets(20, 0, 10, 0);
         rightSection.add(gauge, gbc);
 
-        gbc.gridy = 1;
-        gbc.insets = new Insets(10, 0, 20, 0);
+        gbc.gridy = 1; gbc.insets = new Insets(10, 0, 20, 0);
         rightSection.add(logExpenseBtn, gbc);
 
         mainContent.add(leftSection);
@@ -89,11 +123,18 @@ public class DashboardScreen extends BaseScreen {
         panel.add(mainContent, BorderLayout.CENTER);
     }
 
+    /**
+     * Configures and returns the pie chart wrapped in a fixed-size
+     * {@link ChartPanel}.
+     *
+     * @return the styled chart panel
+     */
     private ChartPanel createPieChart() {
         spendingPieChart.setBackgroundPaint(new Color(30, 30, 30));
         spendingPieChart.getLegend().setBackgroundPaint(new Color(30, 30, 30));
         spendingPieChart.getLegend().setItemPaint(Color.WHITE);
-        spendingPieChart.getLegend().setFrame(new org.jfree.chart.block.BlockBorder(new Color(30, 30, 30)));
+        spendingPieChart.getLegend().setFrame(
+            new org.jfree.chart.block.BlockBorder(new Color(30, 30, 30)));
         spendingPieChart.getLegend().setPosition(RectangleEdge.BOTTOM);
 
         PiePlot plot = (PiePlot) spendingPieChart.getPlot();
@@ -118,6 +159,10 @@ public class DashboardScreen extends BaseScreen {
         return chartPanel;
     }
 
+    /**
+     * Clears and repopulates the pie chart dataset from the current cycle's
+     * expenses, grouped by category.
+     */
     private void refreshPieChart() {
         budgetPieDataset.clear();
         BudgetCycle cycle = app.getActiveCycle();
@@ -125,11 +170,11 @@ public class DashboardScreen extends BaseScreen {
 
         List<Category> categories = app.getCategories();
         Color[] palette = {
-                new Color(155, 191, 224),
-                new Color(232, 160, 154),
-                new Color(144, 208, 144),
-                new Color(255, 204, 128),
-                new Color(186, 155, 224)
+            new Color(155, 191, 224),
+            new Color(232, 160, 154),
+            new Color(144, 208, 144),
+            new Color(255, 204, 128),
+            new Color(186, 155, 224)
         };
 
         PiePlot plot = (PiePlot) spendingPieChart.getPlot();
@@ -144,6 +189,11 @@ public class DashboardScreen extends BaseScreen {
             }
         }
     }
+
+    /**
+     * Loads and refreshes all dashboard data: total spent, daily limit,
+     * today's gauge fill, and the pie chart.
+     */
     public void loadDashboardData() {
         BudgetCycle cycle = app.getActiveCycle();
         if (cycle == null) return;
@@ -152,9 +202,7 @@ public class DashboardScreen extends BaseScreen {
         cycle.setTotalSpent(totalSpent);
 
         double dailyLimit = app.getDailyLimit();
-
-        // Gauge fills based on today's spending vs daily limit
-        double todaySpent = app.getTodaySpent(); // need this in App
+        double todaySpent = app.getTodaySpent();
         double percentage = (dailyLimit > 0) ? todaySpent / dailyLimit : 0;
 
         gauge.update(percentage, String.valueOf(dailyLimit));
@@ -164,18 +212,34 @@ public class DashboardScreen extends BaseScreen {
         refreshPieChart();
     }
 
+    /**
+     * Navigates to the expense logging screen.
+     */
     private void onLogExpenseClicked() {
         app.showExpenseLoggingScreen();
     }
 
+    /**
+     * Updates the daily limit label text.
+     *
+     * @param limit new daily limit value in EGP
+     */
     public void updateDailyLimit(double limit) {
         dailyLimitLabel.setText("Daily limit: " + limit);
     }
 
+    /**
+     * Shows a warning dialog with a budget alert message.
+     *
+     * @param message the warning text to display
+     */
     public void showBudgetWarning(String message) {
         JOptionPane.showMessageDialog(panel, message, "Budget Warning", JOptionPane.WARNING_MESSAGE);
     }
 
+    /**
+     * Navigates to the expense logging screen (public alias for UI callbacks).
+     */
     public void navigateToExpenseLogging() {
         app.showExpenseLoggingScreen();
     }
