@@ -1,6 +1,10 @@
 package control;
 
 import persistence.DatabaseHelper;
+
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+
 import domain.*;
 
 /**
@@ -34,8 +38,12 @@ public class AlertManager {
      * @param message the notification text to display
      */
     public void sendNotification(String message) {
-        System.out.println("ALERT: " + message);
-    }
+    System.out.println("ALERT: " + message); 
+    SwingUtilities.invokeLater(() ->
+        JOptionPane.showMessageDialog(null, message, "Budget Alert", JOptionPane.WARNING_MESSAGE)
+    );
+}
+ 
 
     /**
      * Checks whether a threshold alert has already been sent for a cycle by
